@@ -13,7 +13,6 @@ export default function SearchPanel({
 }: Readonly<SearchPanelProps>) {
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Đóng khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -37,24 +36,32 @@ export default function SearchPanel({
       {open && (
         <motion.div
           ref={panelRef}
-          initial={{ x: -400, opacity: 0 }}
+          initial={{ x: -120, opacity: 0 }} // chỉ trượt nhẹ từ bên trái
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -400, opacity: 0 }}
-          transition={{ type: "keyframes", duration: 0.3 }}
-          className="w-[400px] border-r h-screen bg-white p-6 shadow-[4px_0_10px_rgba(0,0,0,0.1)] relative rounded-r-2xl"
+          exit={{ x: -120, opacity: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+          }}
+          className="w-[400px] border-r h-screen bg-white shadow-[4px_0_10px_rgba(0,0,0,0.1)] relative rounded-r-2xl"
         >
-          <h2 className="text-lg font-semibold mb-4">Tìm kiếm</h2>
-          <input
-            type="text"
-            placeholder="Tìm kiếm"
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-          />
-
-          <div className="mt-6">
-            <h3 className="text-sm font-medium mb-2">Mới đây</h3>
-            <p className="text-sm text-gray-500">
-              Không có nội dung tìm kiếm mới đây.
-            </p>
+          <div className="flex flex-col h-full gap-4 ">
+            <div className="px-4 pt-6">
+              <h2 className="text-2xl font-semibold pb-8 px-2 ">Tìm kiếm</h2>
+              <input
+                type="text"
+                placeholder="Tìm kiếm"
+                className="w-full border rounded-lg px-3 py-2 text-sm placeholder:text-base focus:outline-none border-none bg-gray-200/60"
+              />
+            </div>
+            <div className="w-full h-[1.5px] bg-gray-200"></div>
+            <h3 className="text-base font-medium px-6">Mới đây</h3>
+            <div className="px-6 h-full flex items-center justify-center">
+              <p className="text-sm text-gray-500  ">
+                Không có nội dung tìm kiếm mới đây.
+              </p>
+            </div>
           </div>
         </motion.div>
       )}
