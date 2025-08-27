@@ -36,19 +36,20 @@ export default function SearchPanel({
       {open && (
         <motion.div
           ref={panelRef}
-          initial={{ x: -120, opacity: 0 }} // chỉ trượt nhẹ từ bên trái
+          initial={{ x: -400, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -120, opacity: 0 }}
+          exit={{ x: -400, opacity: 0 }}
           transition={{
             type: "spring",
             stiffness: 300,
             damping: 30,
+            mass: 0.8,
           }}
-          className="w-[400px] border-r h-screen bg-white shadow-[4px_0_10px_rgba(0,0,0,0.1)] relative rounded-r-2xl"
+          className="absolute top-0 left-[72px] w-[400px] h-screen bg-white shadow-[4px_0_10px_rgba(0,0,0,0.1)] rounded-r-2xl z-10"
         >
-          <div className="flex flex-col h-full gap-4 ">
+          <div className="flex flex-col h-full gap-4">
             <div className="px-4 pt-6">
-              <h2 className="text-2xl font-semibold pb-8 px-2 ">Tìm kiếm</h2>
+              <h2 className="text-2xl font-semibold pb-8 px-2">Tìm kiếm</h2>
               <input
                 type="text"
                 placeholder="Tìm kiếm"
@@ -58,7 +59,7 @@ export default function SearchPanel({
             <div className="w-full h-[1.5px] bg-gray-200"></div>
             <h3 className="text-base font-medium px-6">Mới đây</h3>
             <div className="px-6 h-full flex items-center justify-center">
-              <p className="text-sm text-gray-500  ">
+              <p className="text-sm text-gray-500">
                 Không có nội dung tìm kiếm mới đây.
               </p>
             </div>
