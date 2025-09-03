@@ -8,6 +8,7 @@ import {
   Delete,
   BadRequestException,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -33,6 +34,12 @@ export class UserController {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+  @Roles('user')
+  @Get('profile')
+  async profile(@Req() req: any) {
+    const user = req?.user;
+    return await this.userService.profile(user?.userId);
   }
 
   @Get(':id')

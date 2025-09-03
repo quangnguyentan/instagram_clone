@@ -13,7 +13,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    // payload chính là thông tin decode từ token (ví dụ: { sub: userId, email, roles })
-    return { userId: payload.sub, email: payload.email, roles: payload.roles };
+    return { userId: payload.uid, email: payload.email, roles: payload.roles };
   }
 }

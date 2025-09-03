@@ -6,7 +6,6 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { generateAccessToken, generateRefreshToken } from 'src/middlewares/jwt';
-import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -34,8 +33,13 @@ export class AuthService {
     const user: UserDocument | null = await this.userModel.findOne({ email });
     if (user && (await user.isCorrectPassword(password))) {
       const { password, ...userData } = user.toObject();
-      const accessToken = generateAccessToken(user._id as string, user.role);
-      const refreshToken = generateRefreshToken(user._id as string);
+      const accessToken = generateAccessToken(
+        user._id as string,
+        user.role,
+        user.email,
+      );
+      const refreshToken = generateRefreshToken(user._id as string, user.email);
+      console.log(refreshToken);
       await this.userModel.findByIdAndUpdate(
         user._id,
         {
@@ -68,6 +72,25 @@ export class AuthService {
     res.clearCookie('refreshToken', { maxAge: 0 });
     return {
       message: 'Logged out successfully',
+    };
+  }
+  async refresh(req) {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      throw new BadRequestException('No refresh token found');
+    }
+    const user = await this.userModel.findOne({ refreshToken });
+    if (!user) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+    const accessToken = generateAccessToken(
+      user._id as unknown as string,
+      user.role,
+      user.email,
+    );
+    return {
+      message: 'Refreshed successfully',
+      accessToken,
     };
   }
 }

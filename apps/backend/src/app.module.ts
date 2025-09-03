@@ -14,6 +14,7 @@ import { NotificationModule } from './notification/notification.module';
 import { ChatModule } from './chat/chat.module';
 import { MessageModule } from './message/message.module';
 import { NoteModule } from './note/note.module';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { NoteModule } from './note/note.module';
     NotificationModule,
     ChatModule,
     MessageModule,
-    NoteModule
+    NoteModule,
+    LikeModule
   ],
   controllers: [AppController],
   providers: [AppService],

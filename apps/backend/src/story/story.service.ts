@@ -1,26 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStoryDto } from './dto/create-story.dto';
-import { UpdateStoryDto } from './dto/update-story.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Story } from './entities/story.entity';
+import { Model } from 'mongoose';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class StoryService {
-  create(createStoryDto: CreateStoryDto) {
-    return 'This action adds a new story';
+  constructor(
+    @InjectModel(Story.name) private readonly storyModel: Model<Story>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
+
+  async create(dto: CreateStoryDto) {
+    const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    return this.storyModel.create({ ...dto, expireAt });
   }
 
-  findAll() {
-    return `This action returns all story`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} story`;
-  }
-
-  update(id: number, updateStoryDto: UpdateStoryDto) {
-    return `This action updates a #${id} story`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} story`;
+  findByUser(userId: string) {
+    return this.storyModel.find({ user: userId });
   }
 }

@@ -13,6 +13,7 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -29,6 +30,21 @@ export class AuthController {
   async login(@Body() loginAuthDto: LoginDto) {
     try {
       return await this.authService.login(loginAuthDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+  @Get('refresh')
+  async refresh(@Req() req: Request, @Res() res: Response) {
+    try {
+      const result = await this.authService.refresh(req);
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        maxAge: 2 * 60 * 1000,
+      });
+      res.json({ message: result.message, accessToken: result.accessToken });
     } catch (error) {
       throw new BadRequestException(error.message);
     }

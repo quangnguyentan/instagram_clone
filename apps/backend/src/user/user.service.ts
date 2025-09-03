@@ -20,6 +20,11 @@ export class UserService {
     return users;
   }
 
+  async profile(userId: string) {
+    const user = await this.userModel.findById(userId);
+    return user;
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
