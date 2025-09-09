@@ -15,7 +15,7 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly messageService: MessageService) { }
 
   @SubscribeMessage('join_chat')
   handleJoinChat(

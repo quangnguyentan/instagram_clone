@@ -1,34 +1,61 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+// post.controller.ts
+import { Controller, Get, Post as HttpPost, Body, Param, Delete, Put, Query } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { errorResponse, successResponse } from 'src/helper/response.util';
 
-@Controller('post')
+@Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
-  @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto);
+  @HttpPost()
+  async create(@Body() dto: CreatePostDto) {
+    try {
+      const post = await this.postService.create(dto);
+      return successResponse(post, 'Tạo bài viết thành công');
+    } catch (err) {
+      return errorResponse('Tạo bài viết thất bại', err);
+    }
   }
 
   @Get()
-  findAll() {
-    return this.postService.findAll();
+  async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+    try {
+      const posts = await this.postService.findAll(Number(page), Number(limit));
+      return successResponse(posts, 'Lấy danh sách bài viết thành công');
+    } catch (err) {
+      return errorResponse('Không lấy được danh sách bài viết', err);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const post = await this.postService.findOne(id);
+      return successResponse(post, 'Lấy bài viết thành công');
+    } catch (err) {
+      return errorResponse('Không tìm thấy bài viết', err);
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
+    try {
+      const post = await this.postService.update(id, dto);
+      return successResponse(post, 'Cập nhật bài viết thành công');
+    } catch (err) {
+      return errorResponse('Cập nhật bài viết thất bại', err);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  async remove(@Param('id') id: string) {
+    try {
+      await this.postService.remove(id);
+      return successResponse(null, 'Xóa bài viết thành công');
+    } catch (err) {
+      return errorResponse('Xóa bài viết thất bại', err);
+    }
   }
 }

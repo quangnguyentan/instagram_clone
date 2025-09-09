@@ -9,7 +9,7 @@ export class NotificationGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly notificationService: NotificationService) {}
+  constructor(private readonly notificationService: NotificationService) { }
 
   async push(userId: string, dto: CreateNotificationDto) {
     const notif = await this.notificationService.create(dto);

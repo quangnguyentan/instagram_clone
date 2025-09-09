@@ -16,7 +16,7 @@ export class LikeService {
     private readonly commentModel: Model<Comment>,
     @InjectModel(Reel.name) private readonly reelModel: Model<Reel>,
     @InjectModel(Story.name) private readonly storyModel: Model<Story>,
-  ) {}
+  ) { }
 
   async toggle(dto: ToggleLikeDto) {
     const { targetType, targetId, userId } = dto;
