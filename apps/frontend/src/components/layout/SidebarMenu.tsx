@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
-import instagramLogo from "@/assests/images/Instagram_logo.svg";
+import instagramLogo from "@/assets/images/Instagram_logo.svg";
 import { sidebarItems } from "@/lib/constants";
 import Image from "next/image";
 import { InstagramIcon, MenuIcon } from "../ui/Icon";
@@ -18,11 +18,10 @@ import { motion } from "framer-motion";
 const SidebarMenu = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { selected, setSelected } = useSeletedMenuStore();
-
   return (
     <div className="relative h-screen">
       <motion.div
-        className="px-6 py-8 flex flex-col justify-between h-full border-r bg-white"
+        className="px-6 flex flex-col justify-between h-full border-r bg-white"
         animate={{ width: searchOpen ? 72 : 300 }}
         transition={{
           type: "spring",
@@ -50,14 +49,15 @@ const SidebarMenu = () => {
                     <button
                       key={label}
                       onClick={() => {
-                        setSelected(label);
                         setSearchOpen(true);
                       }}
                       className="flex items-center gap-3 rounded-xl py-3 hover:bg-muted cursor-pointer w-full"
                     >
                       <Icon
                         className={`w-6 h-6 ${
-                          selected === label ? "" : "fill-none stroke-current"
+                          selected === label
+                            ? "text-black "
+                            : "fill-none stroke-current"
                         }`}
                       />
                       {!searchOpen && (
@@ -87,7 +87,7 @@ const SidebarMenu = () => {
                         <Icon
                           className={`w-6 h-6 ${
                             selected === label
-                              ? "text-black"
+                              ? "text-black "
                               : "fill-none stroke-current"
                           }`}
                         />
