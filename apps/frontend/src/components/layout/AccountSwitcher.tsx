@@ -16,7 +16,7 @@ const AccountSwitcher = () => {
         </div>
       </div>
       <BaseModal
-        buttonClassName="text-xs! font-bold! px-0! "
+        buttonClassName="text-xs! font-bold! px-0! text-blue-500! hover:underline!"
         buttonLabel="Chuyển"
         buttonType="link"
         title={
@@ -25,7 +25,7 @@ const AccountSwitcher = () => {
             alt="default user"
             width={175}
             height={51}
-            className="flex items-center justify-center mx-auto pt-14 pb-6 select-none"
+            className="flex items-center justify-center mx-auto pt-14 pb-6 select-none "
           />
         }
         modalContent={
@@ -33,6 +33,8 @@ const AccountSwitcher = () => {
             onLogin={() => {}}
             onRegister={() => {}}
             onForgotPassword={() => {}}
+            submitButtonLabel="Đăng nhập"
+            submitButtonClassName="w-full"
           />
         }
         onOk={() => {}}

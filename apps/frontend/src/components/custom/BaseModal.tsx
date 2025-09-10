@@ -53,6 +53,7 @@ const BaseModal = ({
         onCancel={handleCancel}
         footer={null}
         closable={true}
+        transitionName="ant-fade"
       >
         {modalContent}
       </Modal>

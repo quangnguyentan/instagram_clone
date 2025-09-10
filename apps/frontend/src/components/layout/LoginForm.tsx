@@ -23,6 +23,10 @@ interface LoginFormProps {
   passwordHint?: React.ReactNode;
   facebookLogin?: () => void;
   submitButtonLabel?: string;
+  submitButtonType?: "primary" | "default" | "dashed" | "text" | "link";
+  submitButtonClassName?: string;
+  hiddenSubmitButton?: boolean;
+  passwordRemember?: boolean;
 }
 
 const LoginForm = ({
@@ -36,49 +40,63 @@ const LoginForm = ({
   submitButtonType,
   submitButtonClassName,
   hiddenSubmitButton,
+  passwordRemember,
 }: LoginFormProps) => {
   return (
     <div>
       <Form
         name="basic"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 400 }}
-        initialValues={{ remember: true }}
+        initialValues={{ remember: false }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
-        className="flex flex-col items-center justify-center w-full"
+        className="flex flex-col items-center justify-center w-full "
       >
         <Form.Item<FieldType>
           name="username"
           rules={[{ required: true, message: "Please input your username!" }]}
+          className="w-80"
         >
-          <Input placeholder="Username" />
+          <Input
+            placeholder="Số điện thoại, tên người dùng hoặc email"
+            className="placeholder:text-xs! placeholder:text-black/50!"
+            size="large"
+            variant="filled"
+          />
         </Form.Item>
 
         <Form.Item<FieldType>
           name="password"
           rules={[{ required: true, message: "Please input your password!" }]}
+          className="w-80"
         >
-          <Input.Password placeholder="Password" />
+          <Input.Password
+            placeholder="Mật khẩu"
+            classNames={{
+              input: "placeholder:text-xs! placeholder:text-black/50!",
+            }}
+            size="large"
+            variant="filled"
+          />
         </Form.Item>
 
         <Form.Item<FieldType>
           name="remember"
           valuePropName="checked"
           label={null}
+          hidden={passwordRemember}
+          className="w-80 flex justify-start"
         >
-          <Checkbox>Remember me</Checkbox>
+          <Checkbox className="text-xs!">Lưu thông tin đăng nhập</Checkbox>
         </Form.Item>
 
-        <Form.Item label={null}>
+        <Form.Item label={null} className="w-80">
           <Button
             type="primary"
             htmlType="submit"
             className={submitButtonClassName}
           >
-            Submit
+            {submitButtonLabel || "Đăng nhập"}
           </Button>
         </Form.Item>
       </Form>
