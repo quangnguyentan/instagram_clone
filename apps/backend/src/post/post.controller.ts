@@ -1,24 +1,46 @@
 // post.controller.ts
-import { Controller, Get, Post as HttpPost, Body, Param, Delete, Put, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Query,
+  UseGuards,
+  Post,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { errorResponse, successResponse } from 'src/helper/response.util';
+import { JwtAuthGuard } from 'src/auth/guards/guards.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) { }
+  constructor(private readonly postService: PostService) {}
 
-  @HttpPost()
-  async create(@Body() dto: CreatePostDto) {
+  @Roles('user', 'admin')
+  @Post()
+  @UseInterceptors(FilesInterceptor('files'))
+  async create(
+    @Body() dto: CreatePostDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     try {
-      const post = await this.postService.create(dto);
+      const post = await this.postService.create(dto, files);
       return successResponse(post, 'Tạo bài viết thành công');
     } catch (err) {
       return errorResponse('Tạo bài viết thất bại', err);
     }
   }
-
+  @Roles('user', 'admin')
   @Get()
   async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
     try {
@@ -40,9 +62,14 @@ export class PostController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
+  @UseInterceptors(FilesInterceptor('files'))
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdatePostDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     try {
-      const post = await this.postService.update(id, dto);
+      const post = await this.postService.update(id, dto, files);
       return successResponse(post, 'Cập nhật bài viết thành công');
     } catch (err) {
       return errorResponse('Cập nhật bài viết thất bại', err);

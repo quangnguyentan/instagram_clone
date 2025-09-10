@@ -2,17 +2,13 @@
 import { IsString, IsOptional, IsArray, IsEnum } from 'class-validator';
 
 export class CreatePostDto {
-    @IsString()
-    user: string;
+  @IsString()
+  user: string;
 
-    @IsOptional()
-    @IsString()
-    caption?: string;
+  @IsOptional()
+  @IsString()
+  caption?: string;
 
-    @IsArray()
-    mediaUrls: string[];
-
-    @IsEnum(['image', 'video'])
-    mediaType: string;
+  @IsEnum(['image', 'video'])
+  mediaType: string;
 }
-

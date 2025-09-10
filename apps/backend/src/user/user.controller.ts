@@ -26,7 +26,7 @@ export class UserController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
-  @Roles('user')
+  @Roles('user', 'admin')
   @Get()
   async findAll() {
     try {
@@ -35,7 +35,7 @@ export class UserController {
       throw new BadRequestException(error.message);
     }
   }
-  @Roles('user')
+  @Roles('user', 'admin')
   @Get('profile')
   async profile(@Req() req: any) {
     const user = req?.user;

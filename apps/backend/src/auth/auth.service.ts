@@ -55,25 +55,6 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
   }
-  async logout(req, res) {
-    const { refreshToken } = req.cookies;
-    if (!refreshToken) {
-      throw new BadRequestException('No refresh token found');
-    }
-    const user = await this.userModel.findOne({ refreshToken });
-    if (!user) {
-      throw new BadRequestException('Invalid refresh token');
-    }
-    await this.userModel.findOneAndUpdate(
-      { refreshToken: refreshToken },
-      { refreshToken: '' },
-      { new: true },
-    );
-    res.clearCookie('refreshToken', { maxAge: 0 });
-    return {
-      message: 'Logged out successfully',
-    };
-  }
   async refresh(req) {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
@@ -91,6 +72,25 @@ export class AuthService {
     return {
       message: 'Refreshed successfully',
       accessToken,
+    };
+  }
+  async logout(req, res) {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      throw new BadRequestException('No refresh token found');
+    }
+    const user = await this.userModel.findOne({ refreshToken });
+    if (!user) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+    await this.userModel.findOneAndUpdate(
+      { refreshToken: refreshToken },
+      { refreshToken: '' },
+      { new: true },
+    );
+    res.clearCookie('refreshToken', { maxAge: 0 });
+    return {
+      message: 'Logged out successfully',
     };
   }
 }

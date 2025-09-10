@@ -15,6 +15,7 @@ import { ChatModule } from './chat/chat.module';
 import { MessageModule } from './message/message.module';
 import { NoteModule } from './note/note.module';
 import { LikeModule } from './like/like.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { LikeModule } from './like/like.module';
     ChatModule,
     MessageModule,
     NoteModule,
-    LikeModule
+    LikeModule,
+    CloudinaryModule
   ],
   controllers: [AppController],
   providers: [AppService],

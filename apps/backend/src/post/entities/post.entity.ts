@@ -11,8 +11,13 @@ export class Post extends Document {
   @Prop()
   caption?: string;
 
-  @Prop({ type: [String], default: [] })
-  mediaUrls: string[];
+  @Prop([
+    {
+      url: String,
+      public_id: String,
+    },
+  ])
+  media: { url: string; public_id: string }[];
 
   @Prop({ type: String, enum: ['image', 'video'], default: 'image' })
   mediaType: string;
@@ -29,4 +34,4 @@ PostSchema.index({ createdAt: -1 });
 PostSchema.plugin(mongoosePaginate);
 
 // Định nghĩa interface để TypeScript hiểu paginate
-export interface PostDocument extends Post, Document { }
+export interface PostDocument extends Post, Document {}

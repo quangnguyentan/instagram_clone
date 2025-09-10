@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-interface CustomSheetProps {
+interface BaseSheetProps {
   side?: "top" | "bottom" | "left" | "right";
   title?: string;
   trigger: React.ReactNode;
@@ -19,14 +19,14 @@ interface CustomSheetProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export default function CustomSheet({
+export default function BaseSheet({
   side = "right",
   title,
   trigger,
   children,
   open,
   onOpenChange,
-}: Readonly<CustomSheetProps>) {
+}: Readonly<BaseSheetProps>) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>

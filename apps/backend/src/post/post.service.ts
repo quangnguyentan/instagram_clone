@@ -1,24 +1,53 @@
 // post.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, PaginateModel } from 'mongoose';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post, PostDocument } from './entities/post.entity';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class PostService {
   constructor(
-    @InjectModel(Post.name) private postModel: PaginateModel<PostDocument>,
-  ) { }
+    @InjectModel(Post.name)
+    private readonly postModel: PaginateModel<PostDocument>,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
-  async create(dto: CreatePostDto): Promise<Post> {
-    const post = new this.postModel(dto);
+  async create(
+    dto: CreatePostDto,
+    files: Express.Multer.File[],
+  ): Promise<Post> {
+    if (!files.length) throw new BadRequestException('Files are required');
+    const uploadedMedia = [];
+    for (const file of files) {
+      const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
+      if (!cloudinaryResponse.secure_url) {
+        throw new BadRequestException('Tải lên tệp tin thất bại');
+      }
+      (uploadedMedia as { url: string; public_id: string }[]).push({
+        url: cloudinaryResponse.secure_url,
+        public_id: cloudinaryResponse.public_id,
+      });
+    }
+
+    const post = new this.postModel({
+      ...dto,
+      media: uploadedMedia,
+    });
     return post.save();
   }
 
   async findAll(page = 1, limit = 10) {
-    return this.postModel.paginate({}, { page, limit, sort: { createdAt: -1 }, populate: ['user', 'tags'] });
+    return this.postModel.paginate(
+      {},
+      { page, limit, sort: { createdAt: -1 }, populate: ['user', 'tags'] },
+    );
   }
 
   async findOne(id: string): Promise<Post> {
@@ -27,14 +56,51 @@ export class PostService {
     return post;
   }
 
-  async update(id: string, dto: UpdatePostDto): Promise<Post> {
-    const post = await this.postModel.findByIdAndUpdate(id, dto, { new: true });
+  async update(
+    id: string,
+    dto: UpdatePostDto,
+    files: Express.Multer.File[],
+  ): Promise<Post> {
+    if (!files.length) throw new BadRequestException('Files are required');
+    const oldPost = await this.postModel.findById(id);
+    if (!oldPost) throw new NotFoundException('Post not found');
+
+    // xoá ảnh cũ trên Cloudinary
+    if (oldPost.media?.length) {
+      for (const media of oldPost.media) {
+        await this.cloudinaryService.deleteFile(media.public_id);
+      }
+    }
+
+    const uploadedMedia = [];
+    for (const file of files) {
+      const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
+      if (!cloudinaryResponse.secure_url) {
+        throw new BadRequestException('Tải lên tệp tin thất bại');
+      }
+      (uploadedMedia as { url: string; public_id: string }[]).push({
+        url: cloudinaryResponse.secure_url,
+        public_id: cloudinaryResponse.public_id,
+      });
+    }
+    const post = await this.postModel.findByIdAndUpdate(
+      id,
+      { ...dto, media: uploadedMedia },
+      { new: true },
+    );
     if (!post) throw new NotFoundException('Post not found');
     return post;
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.postModel.findByIdAndDelete(id);
-    if (!result) throw new NotFoundException('Post not found');
+    const post = await this.postModel.findById(id);
+    if (!post) throw new NotFoundException('Post not found');
+    // xoá ảnh trên Cloudinary
+    if (post.media?.length) {
+      for (const media of post.media) {
+        await this.cloudinaryService.deleteFile(media.public_id);
+      }
+    }
+    await this.postModel.findByIdAndDelete(id);
   }
 }
