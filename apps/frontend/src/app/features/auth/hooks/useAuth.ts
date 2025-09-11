@@ -1,13 +1,19 @@
 // hooks/useAuth.ts
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { useAuthStore } from "../store/useAuthStore";
 
 export function useLogin() {
+  const setAccessToken = useAuthStore((s) => s.setAccessToken);
+  const setUser = useAuthStore((s) => s.setUser);
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
       const res = await api.post("/auth/login", data);
-      localStorage.setItem("accessToken", res.data.accessToken);
       return res.data;
+    },
+    onSuccess: (data) => {
+      setAccessToken(data.accessToken);
+      setUser(data.user);
     },
   });
 }

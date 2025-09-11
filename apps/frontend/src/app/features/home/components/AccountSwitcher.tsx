@@ -4,7 +4,7 @@ import defaultUser from "@/assets/images/default_user.svg";
 import instagramLogo from "@/assets/images/Instagram_logo.svg";
 import Image from "next/image";
 import BaseModal from "@/shared/custom/BaseModal";
-import Login from "@/shared/layout/LoginForm";
+import Login from "@/app/features/auth/components/LoginForm";
 const AccountSwitcher = () => {
   return (
     <div className="flex items-center gap-2 w-full justify-between  ">
@@ -19,15 +19,7 @@ const AccountSwitcher = () => {
         buttonClassName="text-xs! font-bold! px-0! text-blue-500! hover:underline!"
         buttonLabel="Chuyển"
         buttonType="link"
-        title={
-          <Image
-            src={instagramLogo}
-            alt="default user"
-            width={175}
-            height={51}
-            className="flex items-center justify-center mx-auto pt-14 pb-6 select-none "
-          />
-        }
+        title=""
         modalContent={
           <Login
             onLogin={() => {}}
@@ -35,6 +27,7 @@ const AccountSwitcher = () => {
             onForgotPassword={() => {}}
             submitButtonLabel="Đăng nhập"
             submitButtonClassName="w-full"
+            isAuthenticated={true}
           />
         }
         onOk={() => {}}

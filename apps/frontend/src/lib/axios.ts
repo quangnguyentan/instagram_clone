@@ -1,4 +1,5 @@
 // lib/axios.ts
+import { useAuthStore } from "@/app/features/auth/store/useAuthStore";
 import axios from "axios";
 
 const api = axios.create({
@@ -8,8 +9,7 @@ const api = axios.create({
 
 // Interceptor request -> gắn accessToken
 api.interceptors.request.use((config) => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  const token = useAuthStore.getState().accessToken;
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -22,14 +22,13 @@ api.interceptors.response.use(
       try {
         const refreshRes = await api.get("/auth/refresh");
         const newToken = refreshRes.data.accessToken;
-        localStorage.setItem("accessToken", newToken);
-
+        useAuthStore.getState().setAccessToken(newToken);
         // retry lại request gốc
         error.config.headers.Authorization = `Bearer ${newToken}`;
         return api.request(error.config);
       } catch (refreshError) {
-        localStorage.removeItem("accessToken");
-        window.location.href = "/login"; // hoặc dùng router.push
+        useAuthStore.getState().logout();
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);

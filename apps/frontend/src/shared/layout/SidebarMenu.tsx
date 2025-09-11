@@ -19,9 +19,9 @@ const SidebarMenu = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { selected, setSelected } = useSeletedMenuStore();
   return (
-    <div className="relative h-screen">
+    <div className="relative h-full">
       <motion.div
-        className="px-6 flex flex-col justify-between h-full border-r bg-white"
+        className="flex flex-col justify-between h-full border-r bg-white px-3"
         animate={{ width: searchOpen ? 72 : 300 }}
         transition={{
           type: "spring",
@@ -30,15 +30,21 @@ const SidebarMenu = () => {
           mass: 0.8,
         }}
       >
-        <div className="flex flex-col gap-8">
-          <div className="w-28 h-8">
-            {searchOpen ? (
-              <div>
-                <InstagramIcon className="w-6 h-6" />
-              </div>
-            ) : (
-              <Image src={instagramLogo} className="w-28 h-8" alt="instagram" />
-            )}
+        <div className="flex flex-col gap-6">
+          <div className="px-3">
+            <div className="w-full">
+              {searchOpen ? (
+                <div>
+                  <InstagramIcon className="w-6 h-6" />
+                </div>
+              ) : (
+                <Image
+                  src={instagramLogo}
+                  className="w-28 h-10"
+                  alt="instagram"
+                />
+              )}
+            </div>
           </div>
 
           <TooltipProvider>
@@ -51,7 +57,7 @@ const SidebarMenu = () => {
                       onClick={() => {
                         setSearchOpen(true);
                       }}
-                      className="flex items-center gap-3 rounded-xl py-3 hover:bg-muted cursor-pointer w-full"
+                      className="flex items-center gap-3 rounded-sm py-3 px-3 hover:bg-muted cursor-pointer w-full"
                     >
                       <Icon
                         className={`w-6 h-6 ${
@@ -82,7 +88,7 @@ const SidebarMenu = () => {
                           setSearchOpen(false);
                         }}
                         href={href}
-                        className="flex items-center gap-3 rounded-xl py-3 hover:bg-muted w-full"
+                        className="flex items-center gap-3 rounded-sm py-3 px-3 hover:bg-muted w-full"
                       >
                         <Icon
                           className={`w-6 h-6 ${
@@ -113,7 +119,7 @@ const SidebarMenu = () => {
         </div>
 
         <button
-          className="flex items-center gap-3 cursor-pointer hover:bg-muted rounded-xl w-full"
+          className="flex items-center gap-3 cursor-pointer hover:bg-muted py-3 px-3 rounded-sm w-full"
           onClick={() => setSelected("Xem thêm")}
         >
           <MenuIcon className="w-6 h-6" />
