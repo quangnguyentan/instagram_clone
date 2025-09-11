@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from "@/shared/ui/sheet";
 
 interface BaseSheetProps {
   side?: "top" | "bottom" | "left" | "right";

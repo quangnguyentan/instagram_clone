@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "antd";
 import BaseButton from "./BaseButton";
+import useModalStore from "../../stores/modalStore";
 
 interface BaseModalProps {
   buttonClassName?: string;
@@ -19,9 +20,8 @@ const BaseModal = ({
   title,
   modalContent,
   onOk,
-  onCancel,
 }: BaseModalProps) => {
-  const [open, setOpen] = useState(false);
+  const { open, setOpen, cancel } = useModalStore();
 
   const showModal = () => {
     setOpen(true);
@@ -29,11 +29,6 @@ const BaseModal = ({
 
   const handleOk = () => {
     onOk();
-    setOpen(false);
-  };
-
-  const handleCancel = () => {
-    onCancel();
     setOpen(false);
   };
 
@@ -50,7 +45,7 @@ const BaseModal = ({
         title={title}
         open={open}
         onOk={handleOk}
-        onCancel={handleCancel}
+        onCancel={cancel}
         footer={null}
         closable={true}
         transitionName="ant-fade"

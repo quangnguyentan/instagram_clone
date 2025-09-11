@@ -1,4 +1,4 @@
-import SidebarMenu from "@/components/layout/SidebarMenu";
+import SidebarMenu from "@/shared/layout/SidebarMenu";
 import React from "react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {

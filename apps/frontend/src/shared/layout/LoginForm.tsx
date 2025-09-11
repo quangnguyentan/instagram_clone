@@ -1,18 +1,14 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import type { FormProps } from "antd";
 import { Button, Checkbox, Form, Input } from "antd";
+import { useLogin, useRegister } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import useModalStore from "@/stores/modalStore";
 type FieldType = {
-  username?: string;
+  email?: string;
   password?: string;
   remember?: string;
-};
-
-const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-  console.log("Success:", values);
-};
-
-const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
-  console.log("Failed:", errorInfo);
 };
 
 interface LoginFormProps {
@@ -27,6 +23,7 @@ interface LoginFormProps {
   submitButtonClassName?: string;
   hiddenSubmitButton?: boolean;
   passwordRemember?: boolean;
+  type?: "login" | "register";
 }
 
 const LoginForm = ({
@@ -41,20 +38,65 @@ const LoginForm = ({
   submitButtonClassName,
   hiddenSubmitButton,
   passwordRemember,
+  type = "login",
 }: LoginFormProps) => {
+  const router = useRouter();
+  const [form] = Form.useForm();
+  const [isDisabled, setIsDisabled] = useState(true);
+  const { open } = useModalStore();
+  const { mutate: login, isPending: isLoginPending } = useLogin();
+  const { mutate: register, isPending: isRegisterPending } = useRegister();
+  useEffect(() => {
+    if (open) {
+      form.resetFields();
+    }
+  }, [open, form]);
+
+  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
+    if (type === "login") {
+      login({
+        email: values.email as string,
+        password: values.password as string,
+      });
+    } else {
+      register({
+        email: values.email as string,
+        password: values.password as string,
+        username: values.email as string,
+      });
+    }
+    console.log("Success:", values);
+
+    router.push("/");
+  };
+
+  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
+    errorInfo
+  ) => {
+    console.log("Failed:", errorInfo);
+  };
   return (
     <div>
       <Form
+        form={form}
         name="basic"
         initialValues={{ remember: false }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
-        autoComplete="off"
+        autoComplete="on"
         className="flex flex-col items-center justify-center w-full "
+        onValuesChange={() => {
+          const hasError = form
+            .getFieldsError()
+            .some(({ errors }) => errors.length);
+          const hasEmpty =
+            !form.getFieldValue("email") || !form.getFieldValue("password");
+          setIsDisabled(hasError || hasEmpty);
+        }}
       >
         <Form.Item<FieldType>
-          name="username"
-          rules={[{ required: true, message: "Please input your username!" }]}
+          name="email"
+          // rules={[{ required: true, message: "Please input your email!" }]}
           className="w-80"
         >
           <Input
@@ -67,7 +109,7 @@ const LoginForm = ({
 
         <Form.Item<FieldType>
           name="password"
-          rules={[{ required: true, message: "Please input your password!" }]}
+          // rules={[{ required: true, message: "Please input your password!" }]}
           className="w-80"
         >
           <Input.Password
@@ -94,9 +136,19 @@ const LoginForm = ({
           <Button
             type="primary"
             htmlType="submit"
-            className={submitButtonClassName}
+            className={`${submitButtonClassName} ${isDisabled ? "opacity-50 bg-blue-400 pointer-events-none" : ""}`}
+            loading={type === "login" ? isLoginPending : isRegisterPending}
           >
             {submitButtonLabel || "Đăng nhập"}
+          </Button>
+        </Form.Item>
+        <Form.Item label={null} className="w-80">
+          <Button
+            type="link"
+            htmlType="submit"
+            className="w-full hover:underline text-black! font-medium!"
+          >
+            Quên mật khẩu?
           </Button>
         </Form.Item>
       </Form>

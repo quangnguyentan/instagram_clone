@@ -7,7 +7,7 @@ import {
   HeartIcon,
   ClipboardIcon,
   UserIcon,
-} from "@/components/ui/Icon"; // đổi path theo file của bạn
+} from "@/shared/ui/Icon"; // đổi path theo file của bạn
 
 export const sidebarItems = [
   {

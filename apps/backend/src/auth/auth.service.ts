@@ -39,7 +39,6 @@ export class AuthService {
         user.email,
       );
       const refreshToken = generateRefreshToken(user._id as string, user.email);
-      console.log(refreshToken);
       await this.userModel.findByIdAndUpdate(
         user._id,
         {

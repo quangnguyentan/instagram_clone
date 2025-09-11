@@ -15,7 +15,7 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { errorResponse, successResponse } from 'src/helper/response.util';
+import { errorResponse, successResponse } from 'src/helpers/response.util';
 import { JwtAuthGuard } from 'src/auth/guards/guards.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';

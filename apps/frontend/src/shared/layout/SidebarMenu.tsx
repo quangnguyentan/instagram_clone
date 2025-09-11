@@ -5,7 +5,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/shared/ui/tooltip";
 import Link from "next/link";
 import instagramLogo from "@/assets/images/Instagram_logo.svg";
 import { sidebarItems } from "@/lib/constants";

@@ -3,8 +3,8 @@ import React from "react";
 import defaultUser from "@/assets/images/default_user.svg";
 import instagramLogo from "@/assets/images/Instagram_logo.svg";
 import Image from "next/image";
-import BaseModal from "../custom/BaseModal";
-import Login from "./LoginForm";
+import BaseModal from "@/shared/custom/BaseModal";
+import Login from "@/shared/layout/LoginForm";
 const AccountSwitcher = () => {
   return (
     <div className="flex items-center gap-2 w-full justify-between  ">
