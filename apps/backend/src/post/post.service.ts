@@ -33,7 +33,8 @@ export class PostService {
       (uploadedMedia as { url: string; public_id: string }[]).push({
         url: cloudinaryResponse.secure_url,
         public_id: cloudinaryResponse.public_id,
-      });
+        mediaType: file.mimetype.split('/')[0],
+      } as { url: string; public_id: string; mediaType: 'image' | 'video' });
     }
 
     const post = new this.postModel({
@@ -81,7 +82,8 @@ export class PostService {
       (uploadedMedia as { url: string; public_id: string }[]).push({
         url: cloudinaryResponse.secure_url,
         public_id: cloudinaryResponse.public_id,
-      });
+        mediaType: file.mimetype.split('/')[0],
+      } as { url: string; public_id: string; mediaType: 'image' | 'video' });
     }
     const post = await this.postModel.findByIdAndUpdate(
       id,

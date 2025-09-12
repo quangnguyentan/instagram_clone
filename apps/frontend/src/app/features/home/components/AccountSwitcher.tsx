@@ -4,8 +4,10 @@ import defaultUser from "@/assets/images/default_user.svg";
 import instagramLogo from "@/assets/images/Instagram_logo.svg";
 import Image from "next/image";
 import BaseModal from "@/shared/custom/BaseModal";
-import Login from "@/app/features/auth/components/LoginForm";
+import LoginForm from "@/app/features/auth/components/LoginForm";
+import useModalStore from "@/stores/modalStore";
 const AccountSwitcher = () => {
+  const { setOpen, cancel } = useModalStore();
   return (
     <div className="flex items-center gap-2 w-full justify-between  ">
       <div className="flex items-center gap-1">
@@ -21,7 +23,7 @@ const AccountSwitcher = () => {
         buttonType="link"
         title=""
         modalContent={
-          <Login
+          <LoginForm
             onLogin={() => {}}
             onRegister={() => {}}
             onForgotPassword={() => {}}
@@ -30,8 +32,8 @@ const AccountSwitcher = () => {
             isAuthenticated={true}
           />
         }
-        onOk={() => {}}
-        onCancel={() => {}}
+        onOk={cancel}
+        onCancel={cancel}
       />
     </div>
   );

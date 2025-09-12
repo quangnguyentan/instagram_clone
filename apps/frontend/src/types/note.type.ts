@@ -1,5 +1,5 @@
 export interface Note {
-  id: string;
+  _id: string;
   user: string;
   content: string;
   expireAt?: string; // Date -> string ISO

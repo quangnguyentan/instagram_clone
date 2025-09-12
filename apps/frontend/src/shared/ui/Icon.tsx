@@ -1,14 +1,20 @@
 import { cn } from "@/lib/utils";
 import {
+  Bookmark,
   Clapperboard,
   ClipboardPlus,
   Compass,
   Heart,
   House,
+  ImageIcon,
   Instagram,
   Menu,
   MessageCircle,
+  MessageCircleWarning,
+  Moon,
   Search,
+  Settings,
+  Sun,
   UserRound,
 } from "lucide-react";
 type IconProps = React.SVGProps<SVGSVGElement>;
@@ -42,4 +48,22 @@ export const UserIcon = ({ className, ...props }: IconProps) => {
 };
 export const MenuIcon = ({ className, ...props }: IconProps) => {
   return <Menu className={cn(className)} {...props} />;
+};
+export const SettingsIcon = ({ className, ...props }: IconProps) => {
+  return <Settings className={cn(className)} {...props} />;
+};
+export const ImgIcon = ({ className, ...props }: IconProps) => {
+  return <ImageIcon className={cn(className)} {...props} />;
+};
+export const BookMarkIcon = ({ className, ...props }: IconProps) => {
+  return <Bookmark className={cn(className)} {...props} />;
+};
+export const SunIcon = ({ className, ...props }: IconProps) => {
+  return <Sun className={cn(className)} {...props} />;
+};
+export const MoonIcon = ({ className, ...props }: IconProps) => {
+  return <Moon className={cn(className)} {...props} />;
+};
+export const MessageWarningIcon = ({ className, ...props }: IconProps) => {
+  return <MessageCircleWarning className={cn(className)} {...props} />;
 };

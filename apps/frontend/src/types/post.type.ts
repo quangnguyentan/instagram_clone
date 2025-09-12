@@ -2,14 +2,14 @@
 export interface Media {
   url: string;
   public_id: string;
+  mediaType: "image" | "video";
 }
 
 export interface Post {
-  id: string;
+  _id: string;
   user: string; // userId
   caption?: string;
   media: Media[];
-  mediaType: "image" | "video";
   likes: string[];
   tags: string[];
   createdAt: string;

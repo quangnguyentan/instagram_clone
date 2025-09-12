@@ -1,7 +1,7 @@
 export type NotificationType = "like" | "comment" | "follow" | "mention";
 
 export interface Notification {
-  id: string;
+  _id: string;
   user: string; // recipient
   fromUser: string; // who triggered
   post?: string | null;

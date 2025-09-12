@@ -45,7 +45,7 @@ export default function SearchPanel({
             damping: 30,
             mass: 0.8,
           }}
-          className="absolute top-0 left-[72px] w-[400px] h-screen bg-white shadow-[4px_0_10px_rgba(0,0,0,0.1)] rounded-r-2xl z-10"
+          className="absolute top-0 left-[72px] w-[400px] h-full bg-white shadow-[4px_0_10px_rgba(0,0,0,0.1)] rounded-r-2xl z-10"
         >
           <div className="flex flex-col h-full gap-4">
             <div className="px-4 pt-6">

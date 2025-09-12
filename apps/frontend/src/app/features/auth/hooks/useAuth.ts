@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // hooks/useAuth.ts
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
@@ -11,7 +12,7 @@ export function useLogin() {
       const res = await api.post("/auth/login", data);
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setAccessToken(data.accessToken);
       setUser(data.user);
     },
@@ -20,18 +21,24 @@ export function useLogin() {
 
 export function useRegister() {
   return useMutation({
-    mutationFn: (data: { email: string; password: string; username: string }) =>
-      api.post("/auth/register", data).then((res) => res.data),
+    mutationFn: async (data: {
+      email: string;
+      password: string;
+      username: string;
+    }) => {
+      const res = await api.post("/auth/register", data);
+      return res.data;
+    },
   });
 }
 
 export function useLogout() {
   return useMutation({
-    mutationFn: () =>
-      api.post("/auth/logout").then((res) => {
-        localStorage.removeItem("accessToken");
-        return res.data;
-      }),
+    mutationFn: async () => {
+      const res = await api.post("/auth/logout");
+      useAuthStore.getState().logout();
+      return res.data;
+    },
   });
 }
 
@@ -41,7 +48,7 @@ export function useRefresh() {
     queryKey: ["auth", "refresh"],
     queryFn: async () => {
       const res = await api.get("/auth/refresh");
-      localStorage.setItem("accessToken", res.data.accessToken);
+      useAuthStore.getState().setAccessToken(res.data.accessToken);
       return res.data;
     },
     enabled: false, // gọi thủ công khi cần

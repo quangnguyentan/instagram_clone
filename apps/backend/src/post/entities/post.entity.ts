@@ -15,12 +15,10 @@ export class Post extends Document {
     {
       url: String,
       public_id: String,
+      mediaType: { type: String, enum: ['image', 'video'], required: true },
     },
   ])
-  media: { url: string; public_id: string }[];
-
-  @Prop({ type: String, enum: ['image', 'video'], default: 'image' })
-  mediaType: string;
+  media: { url: string; public_id: string; mediaType: 'image' | 'video' }[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
   likes: Types.ObjectId[];

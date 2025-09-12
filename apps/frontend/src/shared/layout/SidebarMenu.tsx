@@ -14,10 +14,19 @@ import { InstagramIcon, MenuIcon } from "../ui/Icon";
 import SearchPanel from "./SearchPanel";
 import useSeletedMenuStore from "@/stores/selectedMenuStore";
 import { motion } from "framer-motion";
+import BaseDropdown from "../custom/BaseDropdown";
+import { useAuthStore } from "@/app/features/auth/store/useAuthStore";
+import { dropdownItems } from "@/lib/dropdownItems";
+import useModalStore from "@/stores/modalStore";
 
 const SidebarMenu = () => {
   const [searchOpen, setSearchOpen] = useState(false);
+  const { setOpen } = useModalStore();
   const { selected, setSelected } = useSeletedMenuStore();
+  const logout = useAuthStore((s) => s.logout);
+  const handleSwitchAccount = () => {
+    setOpen(true);
+  };
   return (
     <div className="relative h-full">
       <motion.div
@@ -118,21 +127,27 @@ const SidebarMenu = () => {
           </TooltipProvider>
         </div>
 
-        <button
-          className="flex items-center gap-3 cursor-pointer hover:bg-muted py-3 px-3 rounded-sm w-full"
-          onClick={() => setSelected("Xem thêm")}
+        <BaseDropdown
+          items={dropdownItems(logout, handleSwitchAccount)}
+          trigger={["click"]}
+          className="hover:bg-muted py-3 px-3 rounded-sm w-full flex items-center cursor-pointer"
         >
-          <MenuIcon className="w-6 h-6" />
-          {!searchOpen && (
-            <span
-              className={`text-base truncate ${
-                selected === "Xem thêm" ? "font-medium" : "font-normal"
-              }`}
-            >
-              Xem thêm
-            </span>
-          )}
-        </button>
+          <button
+            className="flex items-center gap-3 w-full "
+            onClick={() => setSelected("Xem thêm")}
+          >
+            <MenuIcon className="w-6 h-6" />
+            {!searchOpen && (
+              <span
+                className={`text-base truncate ${
+                  selected === "Xem thêm" ? "font-medium" : "font-normal"
+                }`}
+              >
+                Xem thêm
+              </span>
+            )}
+          </button>
+        </BaseDropdown>
       </motion.div>
 
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />

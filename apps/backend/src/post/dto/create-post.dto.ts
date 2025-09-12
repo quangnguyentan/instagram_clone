@@ -8,7 +8,4 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   caption?: string;
-
-  @IsEnum(['image', 'video'])
-  mediaType: string;
 }

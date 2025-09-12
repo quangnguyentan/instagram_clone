@@ -20,16 +20,12 @@ const BaseModal = ({
   title,
   modalContent,
   onOk,
+  onCancel,
 }: BaseModalProps) => {
-  const { open, setOpen, cancel } = useModalStore();
+  const { open, setOpen } = useModalStore();
 
   const showModal = () => {
     setOpen(true);
-  };
-
-  const handleOk = () => {
-    onOk();
-    setOpen(false);
   };
 
   return (
@@ -44,8 +40,8 @@ const BaseModal = ({
       <Modal
         title={title}
         open={open}
-        onOk={handleOk}
-        onCancel={cancel}
+        onOk={onOk}
+        onCancel={onCancel}
         footer={null}
         closable={true}
         transitionName="ant-fade"

@@ -9,7 +9,11 @@ const streamifier = require('streamifier');
 export class CloudinaryService {
   uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
     return new Promise<CloudinaryResponse>((resolve, reject) => {
+      const resourceType = file.mimetype.startsWith('video')
+        ? 'video'
+        : 'image';
       const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: resourceType },
         (error, result) => {
           if (error) return reject(error);
           if (!result) {
@@ -24,7 +28,7 @@ export class CloudinaryService {
   }
   async deleteFile(publicId: string): Promise<void> {
     try {
-      await cloudinary.uploader.destroy(publicId);
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'auto' });
     } catch (error) {
       console.error('Xoá ảnh thất bại:', error);
       throw error;
