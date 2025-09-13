@@ -7,9 +7,9 @@ import { usePosts } from "@/hooks/usePosts";
 export default function HomePage() {
   const { data: posts } = usePosts();
   return (
-    <div className="h-full w-full flex items-center">
+    <div className="h-full w-full flex items-center overflow-y-auto py-8 scrollbar-hide">
       <div
-        className="h-full mx-auto w-full max-w-2xl overflow-y-auto py-8 scrollbar-hide"
+        className="h-full mx-auto w-full"
         style={{ width: "calc(100% - 600px)" }}
       >
         <Post posts={posts?.data?.docs || []} />

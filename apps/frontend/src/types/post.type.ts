@@ -1,3 +1,5 @@
+import { User } from "./user.type";
+
 // types/post.ts
 export interface Media {
   url: string;
@@ -7,7 +9,7 @@ export interface Media {
 
 export interface Post {
   _id: string;
-  user: string; // userId
+  user: User;
   caption?: string;
   media: Media[];
   likes: string[];

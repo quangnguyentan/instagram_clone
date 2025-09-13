@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
 import { Carousel } from "antd";
-import { Post } from "@/types/post.type";
+import { Media, Post } from "@/types/post.type";
 import Image from "next/image";
+import MediaItem from "../layout/MediaItem";
 
 interface BaseCarouselProps {
   infinite?: boolean;
@@ -11,7 +12,7 @@ interface BaseCarouselProps {
   dots?: boolean;
   pauseOnHover?: boolean;
   pauseOnFocus?: boolean;
-  data?: Post;
+  media?: Media[];
 }
 
 const BaseCarousel: React.FC<BaseCarouselProps> = ({
@@ -22,7 +23,7 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
   dots = true,
   pauseOnHover = true,
   pauseOnFocus = true,
-  data,
+  media,
 }) => {
   const [current, setCurrent] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -51,34 +52,14 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
         className="w-full"
         afterChange={handleAfterChange}
       >
-        {data?.media?.map((item, idx) => (
-          <div
-            className="flex items-center justify-center bg-black"
+        {media?.map((item, idx) => (
+          <MediaItem
             key={item?.public_id}
-          >
-            <div className="relative mx-auto max-w-[500px] aspect-[4/5]">
-              {item.mediaType === "image" && (
-                <Image
-                  src={item.url}
-                  alt={data?.caption || ""}
-                  className="object-contain"
-                  fill
-                />
-              )}
-              {item.mediaType === "video" && (
-                <video
-                  ref={(el) => {
-                    videoRefs.current[idx] = el;
-                  }}
-                  src={item.url}
-                  muted
-                  loop
-                  controls
-                  className="absolute inset-0 w-full h-full object-contain"
-                />
-              )}
-            </div>
-          </div>
+            item={item}
+            refCallback={(el) => {
+              videoRefs.current[idx] = el;
+            }}
+          />
         ))}
       </Carousel>
     </div>

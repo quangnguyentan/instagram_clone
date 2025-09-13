@@ -8,9 +8,9 @@ import { User } from "@/types/user.type";
 export function useUsers() {
   return useQuery<User[]>({
     queryKey: ["users"],
-    queryFn: async () => {
+    queryFn: async (): Promise<User[]> => {
       const res = await api.get("/user");
-      return res.data;
+      return res.data as User[];
     },
   });
 }
@@ -19,9 +19,9 @@ export function useUsers() {
 export function useUserProfile() {
   return useQuery<User>({
     queryKey: ["user-profile"],
-    queryFn: async () => {
+    queryFn: async (): Promise<User> => {
       const res = await api.get("/user/profile");
-      return res.data;
+      return res.data as User;
     },
   });
 }
@@ -30,8 +30,10 @@ export function useUserProfile() {
 export function useCreateUser() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Partial<User>) =>
-      api.post("/user", data).then((res) => res.data),
+    mutationFn: async (data: Partial<User>): Promise<User> => {
+      const res = await api.post("/user", data);
+      return res.data as User;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
 }
@@ -39,8 +41,13 @@ export function useCreateUser() {
 export function useUpdateUser() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...data }: { id: number } & Partial<User>) =>
-      api.patch(`/user/${id}`, data).then((res) => res.data),
+    mutationFn: async ({
+      id,
+      ...data
+    }: { id: number } & Partial<User>): Promise<User> => {
+      const res = await api.patch(`/user/${id}`, data);
+      return res.data as User;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["users"] });
       qc.invalidateQueries({ queryKey: ["user-profile"] });
@@ -51,8 +58,10 @@ export function useUpdateUser() {
 export function useDeleteUser() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) =>
-      api.delete(`/user/${id}`).then((res) => res.data),
+    mutationFn: async (id: number): Promise<User> => {
+      const res = await api.delete(`/user/${id}`);
+      return res.data as User;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
 }

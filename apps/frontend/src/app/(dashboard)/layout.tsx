@@ -43,7 +43,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <SidebarMenu />
       </div>
       <div
-        className="h-full flex items-center justify-center overflow-y-auto  py-8"
+        className="h-full flex items-center justify-center"
         style={{ width: "calc(100% - 300px)" }}
       >
         {children}
