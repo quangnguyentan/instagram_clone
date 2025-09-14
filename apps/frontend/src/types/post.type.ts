@@ -17,3 +17,12 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
 }
+
+
+export interface PaginatedResponse<T> {
+  data: {
+    docs: T[];
+    total: number;
+    page: number;
+  };
+}

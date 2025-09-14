@@ -2,8 +2,8 @@ export interface User {
   _id: string; // _id trong MongoDB
   username: string;
   email: string;
-  fullName?: string;
   role: "user" | "admin";
+  refreshoken: string;
   bio?: string;
   avatarUrl?: string;
   isVerified: boolean;

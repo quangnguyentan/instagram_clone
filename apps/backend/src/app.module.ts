@@ -16,9 +16,11 @@ import { MessageModule } from './message/message.module';
 import { NoteModule } from './note/note.module';
 import { LikeModule } from './like/like.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

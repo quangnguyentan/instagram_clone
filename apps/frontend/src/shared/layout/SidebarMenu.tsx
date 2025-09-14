@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -28,7 +28,7 @@ const SidebarMenu = () => {
     setOpen(true);
   };
   return (
-    <div className="relative h-full">
+    <div className="relative h-full py-8">
       <motion.div
         className="flex flex-col justify-between h-full border-r bg-white px-3"
         animate={{ width: searchOpen ? 72 : 300 }}

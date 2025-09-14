@@ -1,12 +1,15 @@
 // hooks/usePosts.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import { PaginatedResponse, Post } from "@/types/post.type";
 
 export function usePosts(page: number = 1, limit: number = 10) {
   return useQuery({
     queryKey: ["posts", page, limit],
-    queryFn: () =>
-      api.get(`/posts?page=${page}&limit=${limit}`).then((res) => res.data),
+    queryFn: async () => {
+      const res = await api.get<PaginatedResponse<Post>>(`/posts?page=${page}&limit=${limit}`);
+      return res.data;
+    },
   });
 }
 

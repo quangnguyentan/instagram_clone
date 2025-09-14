@@ -6,11 +6,12 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     origin: ['http://localhost:3000', 'http://localhost:5173'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
-  app.setGlobalPrefix('api/v1');
+  
+  // app.setGlobalPrefix('api/v1');
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

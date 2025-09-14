@@ -3,23 +3,46 @@ import {
   WebSocketGateway,
   WebSocketServer,
   SubscribeMessage,
-  MessageBody,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
-import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
+import { Server, Socket } from 'socket.io';
+import { OnEvent } from '@nestjs/event-emitter';
+import { Comment } from './entities/comment.entity';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ cors: { origin: '*' } })
 export class CommentGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly commentService: CommentService) {}
+  handleConnection(client: Socket) {
+    console.log('Client connected:', client.id);
+  }
 
-  @SubscribeMessage('new_comment')
-  async onNewComment(@MessageBody() dto: CreateCommentDto) {
-    const cmt = await this.commentService.create(dto);
-    this.server.to(dto.post.toString()).emit('comment_added', cmt);
-    return cmt;
+  handleDisconnect(client: Socket) {
+    console.log('Client disconnected:', client.id);
+  }
+
+  @SubscribeMessage('join_room')
+  handleJoinRoom(client: Socket, postId: string) {
+    client.join(postId);
+  }
+
+  @SubscribeMessage('leave_room')
+  handleLeaveRoom(client: Socket, postId: string) {
+    client.leave(postId);
+  }
+
+  @OnEvent('comment.created')
+  handleCreated(comment: Comment) {
+    this.server.to(comment.post.toString()).emit('comment.created', comment);
+  }
+
+  @OnEvent('comment.updated')
+  handleUpdated(comment: Comment) {
+    this.server.to(comment.post.toString()).emit('comment.updated', comment);
+  }
+
+  @OnEvent('comment.deleted')
+  handleDeleted(payload: { id: string; postId: string }) {
+    this.server.to(payload.postId).emit('comment.deleted', payload);
   }
 }

@@ -39,7 +39,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }
   return (
     <main className="w-full h-screen flex">
-      <div className="h-full py-8" style={{ width: "300px" }}>
+      <div className="h-full" style={{ width: "300px" }}>
         <SidebarMenu />
       </div>
       <div
