@@ -4,12 +4,14 @@ import React from "react";
 
 const RegisterEmail = () => {
   return (
-    <div>
+    <div className="w-full h-screen flex justify-center items-center">
       <LoginForm
+        submitButtonLabel="Đăng ký"
         type="register"
         onLogin={() => {}}
         onRegister={() => {}}
         onForgotPassword={() => {}}
+        isAuthenticated
       />
     </div>
   );
