@@ -11,7 +11,7 @@ export class CommentService {
     @InjectModel('Comment')
     private readonly commentModel: Model<Comment>,
     private readonly eventEmitter: EventEmitter2,
-  ) { }
+  ) {}
 
   async create(dto: {
     post: string;
@@ -26,8 +26,10 @@ export class CommentService {
   }
 
   async findByPost(postId: string): Promise<Comment[]> {
-
-    return await this.commentModel.find({ post: postId }).exec();
+    return await this.commentModel
+      .find({ post: postId })
+      .populate('user', 'username _id avatar') // lấy các field cần
+      .exec();
   }
 
   async update(id: string, dto: { content: string }): Promise<Comment> {

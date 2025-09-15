@@ -22,12 +22,10 @@ const PostCard = ({ post }: { post: PostType }) => {
   const { data: comments = [] } = useComments(post._id);
   const { user } = useAuthStore();
   console.log(comments);
-  // mutations
   const createMutation = useCreateComment();
   const updateMutation = useUpdateComment();
   const deleteMutation = useDeleteComment();
 
-  // realtime
   useRealtimeComments(post._id);
 
   const handleAddComment = (content: string) => {

@@ -1,6 +1,7 @@
 export interface User {
   _id: string; // _id trong MongoDB
   username: string;
+  fullName: string;
   email: string;
   role: "user" | "admin";
   refreshoken: string;

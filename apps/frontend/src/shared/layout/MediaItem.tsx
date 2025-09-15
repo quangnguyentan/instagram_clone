@@ -26,7 +26,8 @@ const MediaItem: React.FC<MediaItemProps> = ({ item, refCallback }) => {
             src={item.url}
             muted
             loop
-            controls
+            // controls
+            autoPlay
             className="absolute inset-0 w-full h-full object-contain"
           />
         )}

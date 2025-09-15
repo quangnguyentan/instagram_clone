@@ -3,9 +3,9 @@ import { useState } from "react";
 
 export default function PostAddComment({
   onSubmit,
-}: {
+}: Readonly<{
   onSubmit: (content: string) => void;
-}) {
+}>) {
   const [value, setValue] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {

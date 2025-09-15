@@ -25,6 +25,7 @@ export function useRegister() {
       email: string;
       password: string;
       username: string;
+      fullName: string;
     }) => {
       const res = await api.post("/auth/register", data);
       return res.data;
@@ -47,7 +48,7 @@ export function useRefresh() {
   return useQuery({
     queryKey: ["auth", "refresh"],
     queryFn: async () => {
-      const res = await api.get("/auth/refresh");
+      const res = await api.get<{ accessToken: string }>("/auth/refresh");
       useAuthStore.getState().setAccessToken(res.data.accessToken);
       return res.data;
     },

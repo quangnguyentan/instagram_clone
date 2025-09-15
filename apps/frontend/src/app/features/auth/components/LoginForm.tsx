@@ -15,6 +15,8 @@ type FieldType = {
   email?: string;
   password?: string;
   remember?: string;
+  fullname?: string;
+  username?: string;
 };
 
 interface LoginFormProps {
@@ -71,6 +73,7 @@ const LoginForm = ({
         email: values.email as string,
         password: values.password as string,
         username: values.email as string,
+        fullName: values.fullname as string,
       });
     }
 
@@ -110,7 +113,9 @@ const LoginForm = ({
                 .getFieldsError()
                 .some(({ errors }) => errors.length);
               const hasEmpty =
-                !form.getFieldValue("email") || !form.getFieldValue("password");
+                !form.getFieldValue("email") ||
+                !form.getFieldValue("password") ||
+                !form.getFieldValue("fullName");
               setIsDisabled(hasError || hasEmpty);
             }}
           >
@@ -141,7 +146,34 @@ const LoginForm = ({
                 variant="filled"
               />
             </Form.Item>
-
+            {type === "register" && (
+              <Form.Item<FieldType>
+                name="fullname"
+                // rules={[{ required: true, message: "Please input your email!" }]}
+                className="w-80"
+              >
+                <Input
+                  placeholder="Tên đầy đủ"
+                  className="placeholder:text-xs! placeholder:text-black/50!"
+                  size="large"
+                  variant="filled"
+                />
+              </Form.Item>
+            )}
+            {type === "register" && (
+              <Form.Item<FieldType>
+                name="username"
+                // rules={[{ required: true, message: "Please input your email!" }]}
+                className="w-80"
+              >
+                <Input
+                  placeholder="Tên người dùng"
+                  className="placeholder:text-xs! placeholder:text-black/50!"
+                  size="large"
+                  variant="filled"
+                />
+              </Form.Item>
+            )}
             {isAuthenticated && (
               <Form.Item<FieldType>
                 name="remember"
@@ -204,6 +236,7 @@ const LoginForm = ({
                   htmlType="button"
                   className="hover:underline text-purple-500! font-medium! px-1!"
                   onClick={onRegister}
+                  href="/accounts/emailsignup"
                 >
                   Đăng ký
                 </Button>

@@ -27,8 +27,8 @@ const PostCommentsPreview = ({ comments, onUpdate, onDelete }: Props) => {
     }
     setEditingId(null);
   };
-  //   console.log(user?._id, "userid");
-  //   console.log(comments[0].user?._id, "comment user id");
+  console.log(user?._id, "userid");
+  console.log(comments[0].user?._id, "comment user id");
   return (
     <div className="px-2 space-y-2">
       {comments.map((cmt) => (

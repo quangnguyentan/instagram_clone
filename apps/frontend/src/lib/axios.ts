@@ -24,7 +24,9 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       try {
-        const refreshRes = await api.get<{ accessToken: string }>("/auth/refresh");
+        const refreshRes = await api.get<{ accessToken: string }>(
+          "/auth/refresh"
+        );
         const newToken = refreshRes.data.accessToken;
         useAuthStore.getState().setAccessToken(newToken);
         // retry lại request gốc
@@ -32,7 +34,7 @@ api.interceptors.response.use(
         return api.request(error.config);
       } catch (refreshError) {
         useAuthStore.getState().logout();
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     }
     return Promise.reject(error);
