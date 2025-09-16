@@ -12,9 +12,10 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
   async register(registerAuthDto: RegisterDto) {
-    const { username, email, password, ...userData } = registerAuthDto;
+    const { username, email, password, fullname, ...userData } = registerAuthDto;
+    console.log(username, email, password, fullname);
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
       throw new BadRequestException('Email already exists');
@@ -24,6 +25,7 @@ export class AuthService {
       username,
       email,
       password,
+      fullname
     });
     await user.save();
     return user;

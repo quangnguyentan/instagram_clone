@@ -3,13 +3,13 @@ import React, { useEffect, useState } from "react";
 import type { FormProps } from "antd";
 import { Button, Checkbox, Divider, Form, Input } from "antd";
 import { useLogin, useRegister } from "../hooks/useAuth";
-import { useRouter } from "next/navigation";
 import useModalStore from "@/stores/modalStore";
 import instagramLogo from "@/assets/images/Instagram_logo.svg";
 import landing from "@/assets/images/landing.png";
 import facebook from "@/assets/images/facebook.webp";
 
 import Image from "next/image";
+import { useNavigate } from "@/hooks/useNavigate";
 
 type FieldType = {
   email?: string;
@@ -21,8 +21,6 @@ type FieldType = {
 
 interface LoginFormProps {
   className?: string;
-  onLogin: (email: string, password: string) => void;
-  onRegister: () => void;
   onForgotPassword: () => void;
   passwordHint?: React.ReactNode;
   facebookLogin?: () => void;
@@ -37,8 +35,6 @@ interface LoginFormProps {
 
 const LoginForm = ({
   className,
-  onLogin,
-  onRegister,
   onForgotPassword,
   passwordHint,
   facebookLogin,
@@ -50,12 +46,19 @@ const LoginForm = ({
   type = "login",
   isAuthenticated,
 }: LoginFormProps) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [isDisabled, setIsDisabled] = useState(true);
   const { open } = useModalStore();
   const { mutate: login, isPending: isLoginPending } = useLogin();
   const { mutate: register, isPending: isRegisterPending } = useRegister();
+
+  const onLogin = () => {
+    navigate("/");
+  };
+  const onRegister = () => {
+    navigate("/accounts/emailsignup");
+  };
   useEffect(() => {
     if (open) {
       form.resetFields();
@@ -72,12 +75,11 @@ const LoginForm = ({
       register({
         email: values.email as string,
         password: values.password as string,
-        username: values.email as string,
-        fullName: values.fullname as string,
+        username: values.username as string,
+        fullname: values.fullname as string,
       });
     }
-
-    router.push("/");
+    navigate("/");
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -87,217 +89,236 @@ const LoginForm = ({
   };
   return (
     <div>
-      <div
-        className={
-          type === "register"
-            ? "flex items-center justify-center gap-20 border p-10"
-            : "flex items-center justify-center gap-20"
-        }
-      >
-        {!isAuthenticated ||
-          (type === "login" && (
-            <Image src={landing} width={522} height={450} alt="landing" />
-          ))}
-        <div className="flex flex-col items-center justify-center gap-6">
-          {isAuthenticated && (
-            <Image
-              src={instagramLogo}
-              width={175}
-              height={51}
-              alt="Instagram_logo"
-            />
-          )}
-          <Form
-            form={form}
-            name="basic"
-            initialValues={{ remember: false }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            autoComplete="on"
-            className="flex flex-col items-center justify-center w-full"
-            onValuesChange={() => {
-              const hasError = form
-                .getFieldsError()
-                .some(({ errors }) => errors.length);
-              const hasEmpty =
-                !form.getFieldValue("email") ||
-                !form.getFieldValue("password") ||
-                !form.getFieldValue("fullName");
-              setIsDisabled(hasError || hasEmpty);
-            }}
-          >
-            {type === "register" && (
-              <>
-                <div className=" w-72 text-center pb-4">
-                  <span className="font-bold text-gray-500 text-[16px] ">
-                    Đăng ký để xem ảnh và video từ bạn bè.
-                  </span>
-                </div>
-                <Form.Item label={null} className="w-80">
-                  <Button
-                    type={type === "register" ? "primary" : "link"}
-                    htmlType="button"
-                    className={
-                      type !== "register"
-                        ? "w-full text-blue-500! font-medium!"
-                        : "w-full text-white bg-blue-400! font-medium!"
-                    }
-                    // onClick={facebookLogin}
-                    icon={<Image src={facebook} alt="facebook" width={20} />}
-                  >
-                    Đăng nhập bằng Facebook
-                  </Button>
-                </Form.Item>
-                <Divider className="mt-0! ">
-                  <span className="text-xs text-gray-500">HOẶC</span>
-                </Divider>
-              </>
-            )}
-            <Form.Item<FieldType>
-              name="email"
-              // rules={[{ required: true, message: "Please input your email!" }]}
-              className="w-80"
+      <div className="flex items-center justify-center gap-20">
+        {!isAuthenticated && (
+          <Image src={landing} width={522} height={450} alt="landing" />
+        )}
+        <div className="flex flex-col items-center justify-center gap-6 ">
+          <div className={type === "login" ? "" : "px-10 border"}>
+            {type === "login" ||
+              (type === "register" && (
+                <Image
+                  src={instagramLogo}
+                  width={175}
+                  height={51}
+                  alt="Instagram_logo"
+                  className="mx-auto"
+                />
+              ))}
+            <Form
+              form={form}
+              name="basic"
+              initialValues={{ remember: false }}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+              autoComplete="on"
+              className="flex flex-col items-center justify-center"
+              onValuesChange={() => {
+                const hasError = form
+                  .getFieldsError()
+                  .some(({ errors }) => errors.length);
+                const hasEmpty =
+                  type === "register"
+                    ? !form.getFieldValue("email") ||
+                      !form.getFieldValue("password") ||
+                      !form.getFieldValue("fullname") ||
+                      !form.getFieldValue("username")
+                    : !form.getFieldValue("email") ||
+                      !form.getFieldValue("password");
+                setIsDisabled(hasError || hasEmpty);
+              }}
             >
-              <Input
-                placeholder="Số điện thoại, tên người dùng hoặc email"
-                className="placeholder:text-xs! placeholder:text-black/50!"
-                size="large"
-                variant="filled"
-              />
-            </Form.Item>
-
-            <Form.Item<FieldType>
-              name="password"
-              // rules={[{ required: true, message: "Please input your password!" }]}
-              className="w-80"
-            >
-              <Input.Password
-                placeholder="Mật khẩu"
-                classNames={{
-                  input: "placeholder:text-xs! placeholder:text-black/50!",
-                }}
-                size="large"
-                variant="filled"
-              />
-            </Form.Item>
-
-            {type === "register" && (
-              <>
-                <Form.Item<FieldType>
-                  name="fullname"
-                  // rules={[{ required: true, message: "Please input your email!" }]}
-                  className="w-80"
-                >
-                  <Input
-                    placeholder="Tên đầy đủ"
-                    className="placeholder:text-xs! placeholder:text-black/50!"
-                    size="large"
-                    variant="filled"
-                  />
-                </Form.Item>
-                <Form.Item<FieldType>
-                  name="username"
-                  // rules={[{ required: true, message: "Please input your email!" }]}
-                  className="w-80"
-                >
-                  <Input
-                    placeholder="Tên người dùng"
-                    className="placeholder:text-xs! placeholder:text-black/50!"
-                    size="large"
-                    variant="filled"
-                  />
-                </Form.Item>
-                <div className="w-70 text-center flex flex-col gap-2 text-[11px] text-gray-500">
-                  <span className="text-xs text-gray-500">
-                    Những người dùng dịch vụ của chúng tôi có thể đã tải thông
-                    tin liên hệ của bạn lên Instagram.
-                    <span className="text-blue-600">Tìm hiểu thêm</span>
-                  </span>
-                  <div className="">
-                    <span>Bằng cách đăng ký, bạn đồng ý với {""}</span>
-                    <span className="text-blue-600 text-[13px]">
-                      Điều khoản, Chính sách quyền riêng tư và Chính sách cookie
+              {type === "register" && (
+                <>
+                  <div className="w-72 text-center pb-4">
+                    <span className="font-bold text-gray-500 text-[16px] ">
+                      Đăng ký để xem ảnh và video từ bạn bè.
                     </span>
-                    <span>{""} của chúng tôi.</span>
                   </div>
-                </div>
-              </>
-            )}
-
-            {isAuthenticated && type !== "register" && (
-              <Form.Item<FieldType>
-                name="remember"
-                valuePropName="checked"
-                label={null}
-                hidden={passwordRemember}
-                className="w-80 flex justify-start"
-              >
-                <Checkbox className="text-xs!">
-                  Lưu thông tin đăng nhập
-                </Checkbox>
-              </Form.Item>
-            )}
-
-            <Form.Item label={null} className="w-80">
-              <Button
-                type="primary"
-                htmlType="submit"
-                className={`${submitButtonClassName ? submitButtonClassName : "w-80"} ${isDisabled ? "opacity-50 bg-blue-400 pointer-events-none" : ""}`}
-                loading={type === "login" ? isLoginPending : isRegisterPending}
-              >
-                {submitButtonLabel || "Đăng nhập"}
-              </Button>
-            </Form.Item>
-
-            {type === "login" && (
-              <>
-                {!isAuthenticated && (
-                  <Divider className="mt-0! ">
-                    <span className="text-xs text-gray-500">HOẶC</span>
-                  </Divider>
-                )}
-                {!isAuthenticated && (
                   <Form.Item label={null} className="w-80">
                     <Button
-                      type="link"
+                      type={type === "register" ? "primary" : "link"}
                       htmlType="button"
-                      className="w-full text-blue-500! font-medium!"
+                      className={
+                        type !== "register"
+                          ? "w-full text-blue-500! font-medium!"
+                          : "w-full text-white bg-blue-400! font-medium!"
+                      }
                       // onClick={facebookLogin}
                       icon={<Image src={facebook} alt="facebook" width={20} />}
                     >
                       Đăng nhập bằng Facebook
                     </Button>
                   </Form.Item>
-                )}
-                <Form.Item label={null} className="w-80">
-                  <Button
-                    type="link"
-                    htmlType="submit"
-                    className="w-full hover:underline text-black! font-medium!"
+                  <Divider className="mt-0! ">
+                    <span className="text-xs text-gray-500">HOẶC</span>
+                  </Divider>
+                </>
+              )}
+              <Form.Item<FieldType>
+                name="email"
+                // rules={[{ required: true, message: "Please input your email!" }]}
+                className="w-80"
+              >
+                <Input
+                  placeholder="Số điện thoại, tên người dùng hoặc email"
+                  className="placeholder:text-xs! placeholder:text-black/50!"
+                  size="large"
+                  variant="filled"
+                />
+              </Form.Item>
+
+              <Form.Item<FieldType>
+                name="password"
+                // rules={[{ required: true, message: "Please input your password!" }]}
+                className="w-80"
+              >
+                <Input.Password
+                  placeholder="Mật khẩu"
+                  classNames={{
+                    input: "placeholder:text-xs! placeholder:text-black/50!",
+                  }}
+                  size="large"
+                  variant="filled"
+                />
+              </Form.Item>
+
+              {type === "register" && (
+                <>
+                  <Form.Item<FieldType>
+                    name="fullname"
+                    // rules={[{ required: true, message: "Please input your email!" }]}
+                    className="w-80"
                   >
-                    Quên mật khẩu?
-                  </Button>
+                    <Input
+                      placeholder="Tên đầy đủ"
+                      className="placeholder:text-xs! placeholder:text-black/50!"
+                      size="large"
+                      variant="filled"
+                    />
+                  </Form.Item>
+                  <Form.Item<FieldType>
+                    name="username"
+                    // rules={[{ required: true, message: "Please input your email!" }]}
+                    className="w-80"
+                  >
+                    <Input
+                      placeholder="Tên người dùng"
+                      className="placeholder:text-xs! placeholder:text-black/50!"
+                      size="large"
+                      variant="filled"
+                    />
+                  </Form.Item>
+                  <div className="w-70 text-center flex flex-col gap-2 text-[11px] text-gray-500">
+                    <span className="text-xs text-gray-500">
+                      Những người dùng dịch vụ của chúng tôi có thể đã tải thông
+                      tin liên hệ của bạn lên Instagram.
+                      <span className="text-blue-600">Tìm hiểu thêm</span>
+                    </span>
+                    <div className="">
+                      <span>Bằng cách đăng ký, bạn đồng ý với {""}</span>
+                      <span className="text-blue-600 text-[13px]">
+                        Điều khoản, Chính sách quyền riêng tư và Chính sách
+                        cookie
+                      </span>
+                      <span>{""} của chúng tôi.</span>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {isAuthenticated && type !== "register" && (
+                <Form.Item<FieldType>
+                  name="remember"
+                  valuePropName="checked"
+                  label={null}
+                  hidden={passwordRemember}
+                  className="w-80 flex justify-start"
+                >
+                  <Checkbox className="text-xs!">
+                    Lưu thông tin đăng nhập
+                  </Checkbox>
                 </Form.Item>
-                {!isAuthenticated && (
-                  <Form.Item
-                    label={null}
-                    className="flex items-center justify-center w-80"
-                  >
-                    <span>Bạn chưa có tài khoản ư?</span>
+              )}
+
+              <Form.Item label={null} className="w-80">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className={`${submitButtonClassName ? submitButtonClassName : "w-80"} ${isDisabled ? "opacity-50 bg-blue-400 pointer-events-none" : ""}`}
+                  loading={
+                    type === "login" ? isLoginPending : isRegisterPending
+                  }
+                >
+                  {submitButtonLabel || "Đăng nhập"}
+                </Button>
+              </Form.Item>
+
+              {type === "login" && (
+                <>
+                  {!isAuthenticated && (
+                    <Divider className="mt-0! ">
+                      <span className="text-xs text-gray-500">HOẶC</span>
+                    </Divider>
+                  )}
+                  {!isAuthenticated && (
+                    <Form.Item label={null} className="w-80">
+                      <Button
+                        type="link"
+                        htmlType="button"
+                        className="w-full text-blue-500! font-medium!"
+                        // onClick={facebookLogin}
+                        icon={
+                          <Image src={facebook} alt="facebook" width={20} />
+                        }
+                      >
+                        Đăng nhập bằng Facebook
+                      </Button>
+                    </Form.Item>
+                  )}
+                  <Form.Item label={null} className="w-80">
                     <Button
                       type="link"
-                      htmlType="button"
-                      className="hover:underline text-purple-500! font-medium! px-1!"
-                      onClick={onRegister}
-                      href="/accounts/emailsignup"
+                      htmlType="submit"
+                      className="w-full hover:underline text-black! font-medium!"
                     >
-                      Đăng ký
+                      Quên mật khẩu?
                     </Button>
                   </Form.Item>
-                )}
-              </>
-            )}
-          </Form>
+                  {!isAuthenticated && (
+                    <Form.Item
+                      label={null}
+                      className="flex items-center justify-center w-80"
+                    >
+                      <span>Bạn chưa có tài khoản ư?</span>
+                      <Button
+                        type="link"
+                        htmlType="button"
+                        className="hover:underline text-purple-500! font-medium! px-1!"
+                        onClick={onRegister}
+                      >
+                        Đăng ký
+                      </Button>
+                    </Form.Item>
+                  )}
+                </>
+              )}
+            </Form>
+          </div>
+
+          {type === "register" && (
+            <div className="w-full text-center flex flex-col items-center justify-center border">
+              <span className="text-sm">Bạn có tài khoản?</span>
+              <Button
+                type="link"
+                htmlType="button"
+                className="hover:underline text-purple-500! font-medium!"
+                onClick={onLogin}
+              >
+                Đăng nhập
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

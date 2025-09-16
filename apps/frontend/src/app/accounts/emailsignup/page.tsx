@@ -1,6 +1,8 @@
 "use client";
 import LoginForm from "@/app/features/auth/components/LoginForm";
-import React from "react";
+import { useNavigate } from "@/hooks/useNavigate";
+import { useRouter } from "next/navigation";
+import React, { use } from "react";
 
 const RegisterEmail = () => {
   return (
@@ -8,10 +10,8 @@ const RegisterEmail = () => {
       <LoginForm
         submitButtonLabel="Đăng ký"
         type="register"
-        onLogin={() => {}}
-        onRegister={() => {}}
         onForgotPassword={() => {}}
-        isAuthenticated
+        isAuthenticated={false}
       />
     </div>
   );

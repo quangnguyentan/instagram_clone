@@ -25,9 +25,10 @@ export function useRegister() {
       email: string;
       password: string;
       username: string;
-      fullName: string;
+      fullname: string;
     }) => {
       const res = await api.post("/auth/register", data);
+      console.log(res?.data);
       return res.data;
     },
   });

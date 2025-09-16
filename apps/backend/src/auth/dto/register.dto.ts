@@ -27,7 +27,7 @@ export class RegisterDto {
 
   @IsOptional()
   @IsString()
-  fullName?: string;
+  fullname?: string;
 
   @IsOptional()
   @IsString()

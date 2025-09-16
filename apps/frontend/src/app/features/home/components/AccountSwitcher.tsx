@@ -14,7 +14,7 @@ const AccountSwitcher = ({ user }: { user: User }) => {
         <Image src={defaultUser} alt="default user" width={44} height={44} />
         <div className="flex flex-col justify-center ">
           <span className="text-sm font-medium">{user?.username}</span>
-          <span className="text-sm">{user?.username}</span>
+          <span className="text-sm">{user?.fullname}</span>
         </div>
       </div>
       <BaseModal
@@ -24,8 +24,6 @@ const AccountSwitcher = ({ user }: { user: User }) => {
         title=""
         modalContent={
           <LoginForm
-            onLogin={() => {}}
-            onRegister={() => {}}
             onForgotPassword={() => {}}
             submitButtonLabel="Đăng nhập"
             submitButtonClassName="w-full"
