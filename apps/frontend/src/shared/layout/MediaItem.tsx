@@ -11,24 +11,27 @@ interface MediaItemProps {
 const MediaItem: React.FC<MediaItemProps> = ({ item, refCallback }) => {
   return (
     <div className="flex items-center justify-center bg-black">
-      <div className="relative w-full aspect-[1/1] md:aspect-[3/4]">
+      {/* ép khung vuông giống Instagram */}
+      <div className="relative w-full aspect-square overflow-hidden">
         {item.mediaType === "image" && (
           <Image
             src={item.url}
             alt={item.public_id}
-            className="object-contain w-full h-full"
             fill
+            className="object-cover" // crop ảnh cho đầy khung
+            sizes="100vw"
           />
         )}
+
         {item.mediaType === "video" && (
           <video
             ref={refCallback}
             src={item.url}
             muted
             loop
-            // controls
             autoPlay
-            className="absolute inset-0 w-full h-full object-contain"
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
           />
         )}
       </div>

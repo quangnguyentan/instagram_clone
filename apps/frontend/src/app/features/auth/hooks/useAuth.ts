@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// hooks/useAuth.ts
+"use client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
+import { useContext } from "react";
+import { NotificationContext } from "@/providers/NotificationProvider";
 
 export function useLogin() {
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setUser = useAuthStore((s) => s.setUser);
+  const notifyRef = useContext(NotificationContext);
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
       const res = await api.post("/auth/login", data);
@@ -15,11 +18,27 @@ export function useLogin() {
     onSuccess: (data: any) => {
       setAccessToken(data.accessToken);
       setUser(data.user);
+      if (notifyRef && notifyRef.current) {
+        notifyRef.current.success({
+          message: "Đăng nhập thành công",
+          description: "Bạn đã đăng nhập thành công",
+        });
+      }
+    },
+    onError: (error: any) => {
+      if (notifyRef && notifyRef.current) {
+        notifyRef.current.error({
+          message: "Đăng nhập thất bại",
+          description:
+            error?.response?.data?.message || "Đã xảy ra lỗi khi đăng nhập",
+        });
+      }
     },
   });
 }
 
 export function useRegister() {
+  const notifyRef = useContext(NotificationContext);
   return useMutation({
     mutationFn: async (data: {
       email: string;
@@ -28,8 +47,24 @@ export function useRegister() {
       fullname: string;
     }) => {
       const res = await api.post("/auth/register", data);
-      console.log(res?.data);
       return res.data;
+    },
+    onSuccess: () => {
+      if (notifyRef && notifyRef.current) {
+        notifyRef.current.success({
+          message: "Đăng ký thành công",
+          description: "Bạn đã đăng ký thành công",
+        });
+      }
+    },
+    onError: (error: any) => {
+      if (notifyRef && notifyRef.current) {
+        notifyRef.current.error({
+          message: "Đăng ký thất bại",
+          description:
+            error?.response?.data?.message || "Đã xảy ra lỗi khi đăng ký",
+        });
+      }
     },
   });
 }

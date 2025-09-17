@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef, useState } from "react";
 import { Carousel } from "antd";
-import { Media, Post } from "@/types/post.type";
-import Image from "next/image";
+import { Media } from "@/types/post.type";
 import MediaItem from "../layout/MediaItem";
+import { LeftIcon, RightIcon } from "../ui/Icon";
 
 interface BaseCarouselProps {
   infinite?: boolean;
@@ -17,7 +18,7 @@ interface BaseCarouselProps {
 
 const BaseCarousel: React.FC<BaseCarouselProps> = ({
   infinite = false,
-  arrows = false,
+  arrows = true,
   autoplay = false,
   autoplaySpeed = 3000,
   dots = true,
@@ -27,6 +28,8 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
 }) => {
   const [current, setCurrent] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const carouselRef = useRef<any>(null); // Ref for controlling Carousel
+
   const handleAfterChange = (index: number) => {
     setCurrent(index);
     videoRefs.current.forEach((video, idx) => {
@@ -35,14 +38,29 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
         video.play().catch(() => {});
       } else {
         video.pause();
-        // video.currentTime = 0; // reset về đầu
       }
     });
   };
+
+  const goToPrev = () => {
+    if (carouselRef.current) {
+      carouselRef.current.prev();
+    }
+  };
+
+  const goToNext = () => {
+    if (carouselRef.current) {
+      carouselRef.current.next();
+    }
+  };
+
+  const isFirstSlide = current === 0;
+  const isLastSlide = media ? current === media.length - 1 : false;
+
   return (
-    <div className="w-full">
+    <div className="w-full relative group">
       <Carousel
-        arrows={arrows}
+        arrows={false} // Disable default arrows
         infinite={infinite}
         autoplay={autoplay}
         autoplaySpeed={autoplaySpeed}
@@ -51,6 +69,7 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
         pauseOnFocus={pauseOnFocus}
         className="w-full"
         afterChange={handleAfterChange}
+        ref={carouselRef}
       >
         {media?.map((item, idx) => (
           <MediaItem
@@ -62,6 +81,30 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
           />
         ))}
       </Carousel>
+      {arrows && (
+        <>
+          {(!isFirstSlide || infinite) && (
+            <button
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 
+                         bg-black/50 text-white p-2 rounded-full 
+                         opacity-0 group-hover:opacity-100 transition cursor-pointer"
+              onClick={goToPrev}
+            >
+              <LeftIcon />
+            </button>
+          )}
+          {(!isLastSlide || infinite) && (
+            <button
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 
+                         bg-black/50 text-white p-2 rounded-full 
+                         opacity-0 group-hover:opacity-100 transition cursor-pointer"
+              onClick={goToNext}
+            >
+              <RightIcon />
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 };

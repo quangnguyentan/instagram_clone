@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// lib/axios.ts
+
 import { useAuthStore } from "@/app/features/auth/store/useAuthStore";
 import axios from "axios";
 

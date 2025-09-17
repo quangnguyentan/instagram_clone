@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { FormProps } from "antd";
 import { Button, Checkbox, Divider, Form, Input } from "antd";
 import { useLogin, useRegister } from "../hooks/useAuth";
@@ -10,6 +10,7 @@ import facebook from "@/assets/images/facebook.webp";
 
 import Image from "next/image";
 import { useNavigate } from "@/hooks/useNavigate";
+import { BaseNotificationRef } from "@/shared/custom/BaseNotification";
 
 type FieldType = {
   email?: string;
@@ -79,7 +80,6 @@ const LoginForm = ({
         fullname: values.fullname as string,
       });
     }
-    navigate("/");
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -94,17 +94,16 @@ const LoginForm = ({
           <Image src={landing} width={522} height={450} alt="landing" />
         )}
         <div className="flex flex-col items-center justify-center gap-6 ">
-          <div className={type === "login" ? "" : "px-10 border"}>
-            {type === "login" ||
-              (type === "register" && (
-                <Image
-                  src={instagramLogo}
-                  width={175}
-                  height={51}
-                  alt="Instagram_logo"
-                  className="mx-auto"
-                />
-              ))}
+          <div className={type === "login" ? "" : "p-10 border"}>
+            {type && (
+              <Image
+                src={instagramLogo}
+                width={175}
+                height={51}
+                alt="Instagram_logo"
+                className="mx-auto"
+              />
+            )}
             <Form
               form={form}
               name="basic"
@@ -155,78 +154,84 @@ const LoginForm = ({
                   </Divider>
                 </>
               )}
-              <Form.Item<FieldType>
-                name="email"
-                // rules={[{ required: true, message: "Please input your email!" }]}
-                className="w-80"
-              >
-                <Input
-                  placeholder="Số điện thoại, tên người dùng hoặc email"
-                  className="placeholder:text-xs! placeholder:text-black/50!"
-                  size="large"
-                  variant="filled"
-                />
-              </Form.Item>
+              <div className="flex flex-col gap-2">
+                <Form.Item<FieldType>
+                  name="email"
+                  // rules={[{ required: true, message: "Please input your email!" }]}
+                  className="w-80 my-0! py-0!"
+                >
+                  <Input
+                    placeholder="Số điện thoại, tên người dùng hoặc email"
+                    className="placeholder:text-xs! placeholder:text-black/50!"
+                    size="large"
+                    variant="filled"
+                  />
+                </Form.Item>
 
-              <Form.Item<FieldType>
-                name="password"
-                // rules={[{ required: true, message: "Please input your password!" }]}
-                className="w-80"
-              >
-                <Input.Password
-                  placeholder="Mật khẩu"
-                  classNames={{
-                    input: "placeholder:text-xs! placeholder:text-black/50!",
-                  }}
-                  size="large"
-                  variant="filled"
-                />
-              </Form.Item>
+                <Form.Item<FieldType>
+                  name="password"
+                  // rules={[{ required: true, message: "Please input your password!" }]}
+                  className={
+                    type === "login"
+                      ? "w-80 my-0! py-0! pb-4!"
+                      : "w-80 my-0! py-0!"
+                  }
+                >
+                  <Input.Password
+                    placeholder="Mật khẩu"
+                    classNames={{
+                      input: "placeholder:text-xs! placeholder:text-black/50!",
+                    }}
+                    size="large"
+                    variant="filled"
+                  />
+                </Form.Item>
 
+                {type === "register" && (
+                  <>
+                    <Form.Item<FieldType>
+                      name="fullname"
+                      // rules={[{ required: true, message: "Please input your email!" }]}
+                      className="w-80 my-0! py-0!"
+                    >
+                      <Input
+                        placeholder="Tên đầy đủ"
+                        className="placeholder:text-xs! placeholder:text-black/50!"
+                        size="large"
+                        variant="filled"
+                      />
+                    </Form.Item>
+                    <Form.Item<FieldType>
+                      name="username"
+                      // rules={[{ required: true, message: "Please input your email!" }]}
+                      className="w-80 my-0! py-0! pb-4!"
+                    >
+                      <Input
+                        placeholder="Tên người dùng"
+                        className="placeholder:text-xs! placeholder:text-black/50!"
+                        size="large"
+                        variant="filled"
+                      />
+                    </Form.Item>
+                  </>
+                )}
+              </div>
               {type === "register" && (
-                <>
-                  <Form.Item<FieldType>
-                    name="fullname"
-                    // rules={[{ required: true, message: "Please input your email!" }]}
-                    className="w-80"
-                  >
-                    <Input
-                      placeholder="Tên đầy đủ"
-                      className="placeholder:text-xs! placeholder:text-black/50!"
-                      size="large"
-                      variant="filled"
-                    />
-                  </Form.Item>
-                  <Form.Item<FieldType>
-                    name="username"
-                    // rules={[{ required: true, message: "Please input your email!" }]}
-                    className="w-80"
-                  >
-                    <Input
-                      placeholder="Tên người dùng"
-                      className="placeholder:text-xs! placeholder:text-black/50!"
-                      size="large"
-                      variant="filled"
-                    />
-                  </Form.Item>
-                  <div className="w-70 text-center flex flex-col gap-2 text-[11px] text-gray-500">
-                    <span className="text-xs text-gray-500">
-                      Những người dùng dịch vụ của chúng tôi có thể đã tải thông
-                      tin liên hệ của bạn lên Instagram.
-                      <span className="text-blue-600">Tìm hiểu thêm</span>
+                <div className="w-70 text-center flex flex-col gap-2 text-[11px] text-gray-500">
+                  <span className="text-xs text-gray-500">
+                    Những người dùng dịch vụ của chúng tôi có thể đã tải thông
+                    tin liên hệ của bạn lên Instagram.
+                    <span className="text-blue-600">Tìm hiểu thêm</span>
+                  </span>
+                  <div className="">
+                    <span>Bằng cách đăng ký, bạn đồng ý với {""}</span>
+                    <span className="text-blue-600 text-[13px]">
+                      Điều khoản, Chính sách quyền riêng tư và Chính sách cookie
                     </span>
-                    <div className="">
-                      <span>Bằng cách đăng ký, bạn đồng ý với {""}</span>
-                      <span className="text-blue-600 text-[13px]">
-                        Điều khoản, Chính sách quyền riêng tư và Chính sách
-                        cookie
-                      </span>
-                      <span>{""} của chúng tôi.</span>
-                    </div>
+                    <span>{""} của chúng tôi.</span>
                   </div>
-                </>
+                </div>
               )}
-
               {isAuthenticated && type !== "register" && (
                 <Form.Item<FieldType>
                   name="remember"
@@ -262,7 +267,7 @@ const LoginForm = ({
                     </Divider>
                   )}
                   {!isAuthenticated && (
-                    <Form.Item label={null} className="w-80">
+                    <Form.Item label={null} className="w-80 my-0! py-0!">
                       <Button
                         type="link"
                         htmlType="button"
@@ -307,16 +312,15 @@ const LoginForm = ({
           </div>
 
           {type === "register" && (
-            <div className="w-full text-center flex flex-col items-center justify-center border">
+            <div className="w-full text-center flex flex-col items-center justify-center border py-6">
               <span className="text-sm">Bạn có tài khoản?</span>
-              <Button
-                type="link"
-                htmlType="button"
-                className="hover:underline text-purple-500! font-medium!"
+              <button
+                type="button"
+                className="hover:underline text-purple-500! font-medium! py-0! my-0! text-sm cursor-pointer"
                 onClick={onLogin}
               >
                 Đăng nhập
-              </Button>
+              </button>
             </div>
           )}
         </div>

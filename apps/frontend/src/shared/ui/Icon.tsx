@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import {
   Bookmark,
+  ChevronLeft,
+  ChevronRight,
   Clapperboard,
   ClipboardPlus,
   Compass,
@@ -66,4 +68,10 @@ export const MoonIcon = ({ className, ...props }: IconProps) => {
 };
 export const MessageWarningIcon = ({ className, ...props }: IconProps) => {
   return <MessageCircleWarning className={cn(className)} {...props} />;
+};
+export const LeftIcon = ({ className, ...props }: IconProps) => {
+  return <ChevronLeft className={cn(className)} {...props} />;
+};
+export const RightIcon = ({ className, ...props }: IconProps) => {
+  return <ChevronRight className={cn(className)} {...props} />;
 };

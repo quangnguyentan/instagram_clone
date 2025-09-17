@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import Providers from "./providers";
+import Providers from "../providers/QueryClientProvider";
+import { NotificationProvider } from "@/providers/NotificationProvider";
 
 export const metadata: Metadata = {
   title: "Instagram",
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <NotificationProvider>
+          <Providers>{children}</Providers>
+        </NotificationProvider>
       </body>
     </html>
   );

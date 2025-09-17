@@ -18,15 +18,18 @@ import BaseDropdown from "../custom/BaseDropdown";
 import { useAuthStore } from "@/app/features/auth/store/useAuthStore";
 import { dropdownItems } from "@/lib/dropdownItems";
 import useModalStore from "@/stores/modalStore";
+import NotificationPanel from "./NotificationPanel";
 
 const SidebarMenu = () => {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const { setOpen } = useModalStore();
   const { selected, setSelected } = useSeletedMenuStore();
   const logout = useAuthStore((s) => s.logout);
   const handleSwitchAccount = () => {
     setOpen(true);
   };
+  console.log(selected);
   return (
     <div className="relative h-full py-8">
       <motion.div
@@ -42,7 +45,7 @@ const SidebarMenu = () => {
         <div className="flex flex-col gap-6">
           <div className="px-3">
             <div className="w-full">
-              {searchOpen ? (
+              {searchOpen || notificationOpen ? (
                 <div>
                   <InstagramIcon className="w-6 h-6" />
                 </div>
@@ -58,7 +61,7 @@ const SidebarMenu = () => {
 
           <TooltipProvider>
             <nav className="flex flex-col items-start gap-2">
-              {sidebarItems.map(({ label, href, icon: Icon }) => {
+              {sidebarItems?.map(({ label, href, icon: Icon }) => {
                 if (label === "Tìm kiếm") {
                   return (
                     <button
@@ -75,7 +78,7 @@ const SidebarMenu = () => {
                             : "fill-none stroke-current"
                         }`}
                       />
-                      {!searchOpen && (
+                      {!searchOpen && !notificationOpen && (
                         <span
                           className={`text-base truncate ${
                             selected === label ? "font-medium" : "font-normal"
@@ -87,7 +90,34 @@ const SidebarMenu = () => {
                     </button>
                   );
                 }
-
+                if (label === "Thông báo") {
+                  return (
+                    <button
+                      key={label}
+                      onClick={() => {
+                        setNotificationOpen(true);
+                      }}
+                      className="flex items-center gap-3 rounded-sm py-3 px-3 hover:bg-muted cursor-pointer w-full"
+                    >
+                      <Icon
+                        className={`w-6 h-6 ${
+                          selected === label
+                            ? "text-black "
+                            : "fill-none stroke-current"
+                        }`}
+                      />
+                      {!notificationOpen && !searchOpen && (
+                        <span
+                          className={`text-base truncate  ${
+                            selected === label ? "font-medium" : "font-normal"
+                          }`}
+                        >
+                          {label}
+                        </span>
+                      )}
+                    </button>
+                  );
+                }
                 return (
                   <Tooltip key={label}>
                     <TooltipTrigger asChild>
@@ -95,6 +125,7 @@ const SidebarMenu = () => {
                         onClick={() => {
                           setSelected(label);
                           setSearchOpen(false);
+                          setNotificationOpen(false);
                         }}
                         href={href}
                         className="flex items-center gap-3 rounded-sm py-3 px-3 hover:bg-muted w-full"
@@ -106,7 +137,7 @@ const SidebarMenu = () => {
                               : "fill-none stroke-current"
                           }`}
                         />
-                        {!searchOpen && (
+                        {!searchOpen && !notificationOpen && (
                           <span
                             className={`text-base truncate ${
                               selected === label ? "font-medium" : "font-normal"
@@ -134,10 +165,14 @@ const SidebarMenu = () => {
         >
           <button
             className="flex items-center gap-3 w-full "
-            onClick={() => setSelected("Xem thêm")}
+            onClick={() => {
+              setSelected("Xem thêm");
+              setSearchOpen(false);
+              setNotificationOpen(false);
+            }}
           >
             <MenuIcon className="w-6 h-6" />
-            {!searchOpen && (
+            {!searchOpen && !notificationOpen && (
               <span
                 className={`text-base truncate ${
                   selected === "Xem thêm" ? "font-medium" : "font-normal"
@@ -151,6 +186,10 @@ const SidebarMenu = () => {
       </motion.div>
 
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <NotificationPanel
+        open={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
+      />
     </div>
   );
 };

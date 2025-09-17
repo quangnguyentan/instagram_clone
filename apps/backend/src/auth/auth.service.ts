@@ -12,20 +12,21 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
   async register(registerAuthDto: RegisterDto) {
-    const { username, email, password, fullname, ...userData } = registerAuthDto;
+    const { username, email, password, fullname, ...userData } =
+      registerAuthDto;
     console.log(username, email, password, fullname);
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
-      throw new BadRequestException('Email already exists');
+      throw new BadRequestException('Email đã tồn tại');
     }
     const user = await this.userModel.create({
       ...userData,
       username,
       email,
       password,
-      fullname
+      fullname,
     });
     await user.save();
     return user;
@@ -53,17 +54,17 @@ export class AuthService {
         user: userData,
       };
     } else {
-      throw new BadRequestException('Invalid email or password');
+      throw new BadRequestException('Email hoặc mật khẩu không hợp lệ');
     }
   }
   async refresh(req) {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-      throw new BadRequestException('No refresh token found');
+      throw new BadRequestException('Không tìm thấy refresh token');
     }
     const user = await this.userModel.findOne({ refreshToken });
     if (!user) {
-      throw new BadRequestException('Invalid refresh token');
+      throw new BadRequestException('Refresh token không hợp lệ');
     }
     const accessToken = generateAccessToken(
       user._id as unknown as string,
@@ -78,11 +79,11 @@ export class AuthService {
   async logout(req, res) {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-      throw new BadRequestException('No refresh token found');
+      throw new BadRequestException('Không tìm thấy refresh token');
     }
     const user = await this.userModel.findOne({ refreshToken });
     if (!user) {
-      throw new BadRequestException('Invalid refresh token');
+      throw new BadRequestException('Refresh token không hợp lệ');
     }
     await this.userModel.findOneAndUpdate(
       { refreshToken: refreshToken },

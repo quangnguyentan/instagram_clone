@@ -129,3 +129,14 @@
   -ms-overflow-style: none;  /* IE, Edge */
   scrollbar-width: none;     /* Firefox */
 }
+
+/* Target only default slick arrows, not custom ones */
+.custom-carousel button.slick-prev:not([class*="bg-black"]),
+.custom-carousel button.slick-next:not([class*="bg-black"]) {
+  display: none !important;
+}
+
+button.slick-prev[type="button"],
+button.slick-next[type="button"] {
+  display: none !important;
+}

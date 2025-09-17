@@ -2,15 +2,15 @@
 import React from "react";
 import BasePanel from "../custom/BasePanel";
 
-interface SearchPanelProps {
+interface NotificationPanelProps {
   open: boolean;
   onClose?: () => void;
 }
 
-export default function SearchPanel({
+export default function NotificationPanel({
   open,
   onClose,
-}: Readonly<SearchPanelProps>) {
+}: Readonly<NotificationPanelProps>) {
   return (
     <BasePanel open={open} onClose={onClose}>
       <div className="flex flex-col h-full gap-4">
