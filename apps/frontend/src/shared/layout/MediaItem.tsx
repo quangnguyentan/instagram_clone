@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { Media } from "@/types/post.type";
+import useModalStore from "@/stores/modalStore";
 
 interface MediaItemProps {
   item: Media;
@@ -9,10 +10,17 @@ interface MediaItemProps {
 }
 
 const MediaItem: React.FC<MediaItemProps> = ({ item, refCallback }) => {
+  const { type } = useModalStore();
   return (
     <div className="flex items-center justify-center bg-black">
       {/* ép khung vuông giống Instagram */}
-      <div className="relative w-full aspect-square overflow-hidden">
+      <div
+        className={
+          type === "comment"
+            ? "relative w-full aspect-8/6 overflow-hidden"
+            : "relative w-full aspect-square overflow-hidden"
+        }
+      >
         {item.mediaType === "image" && (
           <Image
             src={item.url}

@@ -23,13 +23,12 @@ import NotificationPanel from "./NotificationPanel";
 const SidebarMenu = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const { setOpen } = useModalStore();
+  const { setModal } = useModalStore();
   const { selected, setSelected } = useSeletedMenuStore();
   const logout = useAuthStore((s) => s.logout);
   const handleSwitchAccount = () => {
-    setOpen(true);
+    setModal("login");
   };
-  console.log(selected);
   return (
     <div className="relative h-full py-8">
       <motion.div

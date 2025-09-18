@@ -1,14 +1,21 @@
 import { Comment } from "@/types/comment.type";
 import { useAuthStore } from "@/app/features/auth/store/useAuthStore";
 import React, { useState } from "react";
+import { HeartIcon } from "../ui/Icon";
 
 interface Props {
   comments: Comment[];
   onUpdate: (id: string, content: string) => void;
   onDelete: (id: string) => void;
+  onLike: (id: string, likes: string[]) => void;
 }
 
-const PostCommentsPreview = ({ comments, onUpdate, onDelete }: Props) => {
+const PostCommentsPreview = ({
+  comments,
+  onUpdate,
+  onDelete,
+  onLike,
+}: Props) => {
   const { user } = useAuthStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
@@ -27,14 +34,13 @@ const PostCommentsPreview = ({ comments, onUpdate, onDelete }: Props) => {
     }
     setEditingId(null);
   };
-  console.log(user?._id, "userid");
-  console.log(comments[0].user?._id, "comment user id");
+
   return (
-    <div className="px-2 space-y-2">
+    <div className="space-y-2">
       {comments.map((cmt) => (
         <div
           key={cmt._id}
-          className="flex items-start justify-between bg-gray-50 p-2 rounded-md"
+          className="flex items-start justify-between rounded-md"
         >
           <div className="text-sm flex-1">
             <span className="font-semibold mr-1">{cmt.user?.username}</span>
@@ -42,14 +48,19 @@ const PostCommentsPreview = ({ comments, onUpdate, onDelete }: Props) => {
               <input
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1 text-sm w-full focus:outline-none focus:ring focus:ring-blue-200"
+                className="border border-gray-300 rounded px-2 py-1 text-sm  focus:outline-none focus:ring focus:ring-blue-200"
                 autoFocus
               />
             ) : (
               <span>{cmt.content}</span>
             )}
           </div>
-
+          {
+            <HeartIcon
+              className={`${cmt.likes.includes(user?._id || "") ? "text-red-500 fill-red-500" : ""} w-4 h-4 cursor-pointer`}
+              onClick={() => onLike(cmt?._id, cmt.likes)}
+            />
+          }
           {user?._id === cmt.user?._id && (
             <div className="flex gap-2 text-xs ml-2">
               {editingId === cmt._id ? (
@@ -71,12 +82,12 @@ const PostCommentsPreview = ({ comments, onUpdate, onDelete }: Props) => {
                 <>
                   <button
                     onClick={() => handleEdit(cmt._id, cmt.content)}
-                    className="text-blue-500 hover:text-blue-700"
+                    className="text-blue-500 hover:text-blue-700 cursor-pointer"
                   >
                     Edit
                   </button>
                   <button
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 cursor-pointer"
                     onClick={() => onDelete(cmt._id)}
                   >
                     Delete

@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/hooks/commentHooks.ts
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { io, Socket } from "socket.io-client";
 import { useEffect } from "react";
 import api from "@/lib/axios"; // axios instance đã config baseURL + token
 import { Comment } from "@/types/comment.type";
+import { useSocket } from "@/app/features/socket/SocketProvider";
 
 // API
 const fetchComments = async (postId: string): Promise<Comment[]> => {
@@ -24,7 +23,7 @@ const createComment = async (data: {
 
 const updateComment = async (
   id: string,
-  data: { content: string }
+  data: { content?: string; likes?: string[] }
 ): Promise<Comment> => {
   const res = await api.patch<Comment>(`/comment/${id}`, data);
   return res.data;
@@ -59,8 +58,13 @@ export function useCreateComment() {
 export function useUpdateComment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { content: string } }) =>
-      updateComment(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { content?: string; likes?: string[] };
+    }) => updateComment(id, data),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: ["comments", updated.post] });
     },
@@ -78,16 +82,11 @@ export function useDeleteComment() {
     },
   });
 }
-// Realtime Hook
 export function useRealtimeComments(postId: string) {
   const queryClient = useQueryClient();
-
+  const socket = useSocket();
   useEffect(() => {
     if (!postId) return;
-
-    const socket: Socket = io(
-      process.env.NEXT_PUBLIC_WS_URL || "http://localhost:8080"
-    );
 
     socket.emit("join_room", postId);
 
@@ -115,7 +114,9 @@ export function useRealtimeComments(postId: string) {
 
     return () => {
       socket.emit("leave_room", postId);
-      socket.disconnect();
+      socket.off("comment.created");
+      socket.off("comment.updated");
+      socket.off("comment.deleted");
     };
   }, [postId, queryClient]);
 }

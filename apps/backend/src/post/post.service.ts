@@ -10,6 +10,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post, PostDocument } from './entities/post.entity';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { ToggleLikeDto } from 'src/like/dto/toggle-like.dto';
 
 @Injectable()
 export class PostService {
@@ -104,5 +105,16 @@ export class PostService {
       }
     }
     await this.postModel.findByIdAndDelete(id);
+  }
+
+  async toggleLike(id: string, dto: ToggleLikeDto): Promise<Post> {
+    const post = await this.postModel.findById(id);
+    if (!post) throw new NotFoundException('Post not found');
+    const likes = new Set((post.likes || []).map((x: any) => x.toString()));
+    if (likes.has(dto.userId)) likes.delete(dto.userId);
+    else likes.add(dto.userId);
+    post.likes = Array.from(likes) as any;
+    await post.save();
+    return post;
   }
 }

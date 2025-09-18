@@ -1,4 +1,7 @@
-import React from "react";
+import PostCommentAction from "./PostCommentAction";
+import PostLikeAction from "./PostLikeAction";
+import PostSaveAction from "./PostSaveAction";
+import PostShareAction from "./PostShareAction";
 
 interface PostActionsProps {
   liked: string[];
@@ -15,7 +18,18 @@ const PostActions = ({
   onShare,
   onSave,
 }: PostActionsProps) => {
-  return <div>PostActions</div>;
+  return (
+    <div className="flex gap-4 justify-between py-2">
+      <div className="flex gap-4">
+        <PostLikeAction liked={liked} onLike={onLike} />
+        <PostCommentAction onComment={onComment} />
+        <PostShareAction onShare={onShare} />
+      </div>
+      <div>
+        <PostSaveAction onSave={onSave} />
+      </div>
+    </div>
+  );
 };
 
 export default PostActions;

@@ -7,7 +7,9 @@ export function usePosts(page: number = 1, limit: number = 10) {
   return useQuery({
     queryKey: ["posts", page, limit],
     queryFn: async () => {
-      const res = await api.get<PaginatedResponse<Post>>(`/posts?page=${page}&limit=${limit}`);
+      const res = await api.get<PaginatedResponse<Post>>(
+        `/posts?page=${page}&limit=${limit}`
+      );
       return res.data;
     },
   });
@@ -62,5 +64,26 @@ export function useDeletePost() {
       return res.data;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["posts"] }),
+  });
+}
+
+export function useToggleLikePost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      postId,
+      likes,
+    }: {
+      postId: string;
+      likes: string[];
+    }) => {
+      const res = await api.patch(`/posts/${postId}`, { likes });
+      return res.data as Post;
+    },
+    onSuccess: (updated: Post) => {
+      // invalidate cache post list và post detail
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["posts", updated?._id] });
+    },
   });
 }

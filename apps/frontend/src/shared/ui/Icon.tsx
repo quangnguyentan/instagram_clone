@@ -6,6 +6,7 @@ import {
   Clapperboard,
   ClipboardPlus,
   Compass,
+  Ellipsis,
   Heart,
   House,
   ImageIcon,
@@ -15,6 +16,7 @@ import {
   MessageCircleWarning,
   Moon,
   Search,
+  Send,
   Settings,
   Sun,
   UserRound,
@@ -74,4 +76,11 @@ export const LeftIcon = ({ className, ...props }: IconProps) => {
 };
 export const RightIcon = ({ className, ...props }: IconProps) => {
   return <ChevronRight className={cn(className)} {...props} />;
+};
+export const SendIcon = ({ className, ...props }: IconProps) => {
+  return <Send className={cn(className)} {...props} />;
+};
+
+export const EllipsisIcon = ({ className, ...props }: IconProps) => {
+  return <Ellipsis className={cn(className)} {...props} />;
 };

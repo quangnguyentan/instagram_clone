@@ -30,7 +30,7 @@ const BaseButton = ({
     <Button
       type={type}
       onClick={handleClick}
-      className={className}
+      className={`${className} m-0! p-0!`}
       disabled={disabled}
       loading={loading}
       icon={icon}

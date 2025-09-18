@@ -11,6 +11,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFiles,
+  Patch,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -20,6 +21,7 @@ import { JwtAuthGuard } from 'src/auth/guards/guards.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ToggleLikeDto } from 'src/like/dto/toggle-like.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('posts')
@@ -73,6 +75,16 @@ export class PostController {
       return successResponse(post, 'Cập nhật bài viết thành công');
     } catch (err) {
       return errorResponse('Cập nhật bài viết thất bại', err);
+    }
+  }
+
+  @Patch(':id')
+  async toggleLike(@Param('id') id: string, @Body() dto: ToggleLikeDto) {
+    try {
+      const post = await this.postService.toggleLike(id, dto);
+      return successResponse(post, 'Thích bài viết thành công');
+    } catch (err) {
+      return errorResponse('Thích bài viết thất bại', err);
     }
   }
 

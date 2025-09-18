@@ -13,14 +13,6 @@ export class CommentGateway {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    console.log('Client connected:', client.id);
-  }
-
-  handleDisconnect(client: Socket) {
-    console.log('Client disconnected:', client.id);
-  }
-
   @SubscribeMessage('join_room')
   handleJoinRoom(client: Socket, postId: string) {
     client.join(postId);

@@ -1,5 +1,4 @@
 import React from "react";
-import { Post as PostType } from "@/types/post.type";
 import { User } from "@/types/user.type";
 
 interface PostCaptionProps {

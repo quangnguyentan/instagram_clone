@@ -65,7 +65,6 @@ const LoginForm = ({
       form.resetFields();
     }
   }, [open, form]);
-
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     if (type === "login") {
       login({
@@ -221,7 +220,7 @@ const LoginForm = ({
                   <span className="text-xs text-gray-500">
                     Những người dùng dịch vụ của chúng tôi có thể đã tải thông
                     tin liên hệ của bạn lên Instagram.
-                    <span className="text-blue-600">Tìm hiểu thêm</span>
+                    <span className="text-blue-600"> Tìm hiểu thêm </span>
                   </span>
                   <div className="">
                     <span>Bằng cách đăng ký, bạn đồng ý với {""}</span>

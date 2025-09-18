@@ -140,3 +140,10 @@ button.slick-prev[type="button"],
 button.slick-next[type="button"] {
   display: none !important;
 }
+
+.ant-modal-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-left: "auto" !important;
+  margin-right: "auto" !important;
+}
