@@ -71,6 +71,7 @@ const LoginForm = ({
         email: values.email as string,
         password: values.password as string,
       });
+      form.resetFields();
     } else {
       register({
         email: values.email as string,
@@ -78,6 +79,7 @@ const LoginForm = ({
         username: values.username as string,
         fullname: values.fullname as string,
       });
+      form.resetFields();
     }
   };
 
@@ -249,7 +251,8 @@ const LoginForm = ({
                 <Button
                   type="primary"
                   htmlType="submit"
-                  className={`${submitButtonClassName ? submitButtonClassName : "w-80"} ${isDisabled ? "opacity-50 bg-blue-400 pointer-events-none" : ""}`}
+                  disabled={isDisabled}
+                  className={`${submitButtonClassName ? submitButtonClassName : "w-80"} ${isDisabled ? "pointer-events-none disabled:opacity-50! disabled:bg-blue-400! disabled:text-white!" : ""}`}
                   loading={
                     type === "login" ? isLoginPending : isRegisterPending
                   }
@@ -282,8 +285,11 @@ const LoginForm = ({
                   )}
                   <Form.Item label={null} className="w-80">
                     <Button
+                      onClick={() => {
+                        console.log("click forgot password");
+                      }}
                       type="link"
-                      htmlType="submit"
+                      htmlType="button"
                       className="w-full hover:underline text-black! font-medium!"
                     >
                       Quên mật khẩu?

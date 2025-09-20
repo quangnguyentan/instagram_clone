@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   Patch,
+  Req,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -52,7 +53,26 @@ export class PostController {
       return errorResponse('Không lấy được danh sách bài viết', err);
     }
   }
-
+  // post.controller.ts
+  @Roles('user', 'admin')
+  @Get('feed')
+  async getFeed(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Req() req: any,
+  ) {
+    const userId = req?.user?.userId;
+    try {
+      const posts = await this.postService.getFeed(
+        userId,
+        Number(page),
+        Number(limit),
+      );
+      return successResponse(posts, 'Lấy bài viết feed thành công');
+    } catch (err) {
+      return errorResponse('Không lấy được feed', err);
+    }
+  }
   @Get(':id')
   async findOne(@Param('id') id: string) {
     try {

@@ -1,19 +1,14 @@
 import Image from "next/image";
 import React from "react";
-import insta from "@/assets/images/insta_icon.jpg";
+import { User } from "@/types/user.type";
+import defaultSuggestUser from "@/assets/images/default_suggest_user.jpg";
+import FollowButton from "@/shared/layout/FollowButton";
 
-const friendSuggestions = [
-  { id: 1, name: "John Doe", avatar: insta },
-  { id: 2, name: "Jane Doe", avatar: insta },
-  {
-    id: 3,
-    name: "Johnathan Super Long Name That Will Be Truncated",
-    avatar: insta,
-  },
-  { id: 4, name: "Jane Doe", avatar: insta },
-];
+interface FriendSuggestionsProps {
+  suggestions: User[];
+}
 
-const FriendSuggestions = () => {
+const FriendSuggestions = ({ suggestions }: FriendSuggestionsProps) => {
   return (
     <div className="w-full">
       {/* Header */}
@@ -26,25 +21,29 @@ const FriendSuggestions = () => {
 
       {/* Friend list */}
       <div className="mt-3 space-y-3">
-        {friendSuggestions.map((friend) => (
-          <div key={friend.id} className="flex items-center justify-between">
+        {suggestions?.map((friend) => (
+          <div key={friend._id} className="flex items-center justify-between">
             <div className="flex items-center space-x-2 min-w-0 flex-1">
-              <Image
-                src={friend.avatar}
-                alt={friend.name}
-                width={44}
-                height={44}
-                className="rounded-full"
-              />
+              <div className="w-11 h-11 border rounded-full">
+                <Image
+                  src={friend.avatarUrl || defaultSuggestUser}
+                  alt={friend.fullname}
+                  width={44}
+                  height={44}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
               <span className="text-sm font-medium truncate">
-                {friend.name}
+                {friend.fullname}
               </span>
             </div>
 
             {/* Follow button */}
-            <button className="text-xs font-bold text-blue-500">
-              Theo dõi
-            </button>
+            <FollowButton
+              targetId={friend._id}
+              isFollowing={friend?.followers?.includes(friend?._id)}
+            />
           </div>
         ))}
       </div>

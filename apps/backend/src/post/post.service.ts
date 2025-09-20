@@ -11,12 +11,15 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post, PostDocument } from './entities/post.entity';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ToggleLikeDto } from 'src/like/dto/toggle-like.dto';
+import { User, UserDocument } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name)
     private readonly postModel: PaginateModel<PostDocument>,
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
@@ -116,5 +119,38 @@ export class PostService {
     post.likes = Array.from(likes) as any;
     await post.save();
     return post;
+  }
+  // post.service.ts
+  async getFeed(userId: string, page: number, limit: number) {
+    // Lấy danh sách user mà mình follow
+    const currentUser = await this.userModel
+      .findById(userId)
+      .select('following');
+    if (!currentUser) throw new Error('User không tồn tại');
+
+    // Lấy tất cả user có followers > 10
+    const popularUsers = await this.userModel
+      .find({ $expr: { $gt: [{ $size: '$followers' }, 10] } })
+      .select('_id');
+
+    const popularUserIds = popularUsers.map((u) => u._id);
+
+    // Hợp mảng userId từ following + popular
+    const targetUserIds = [
+      ...new Set([...currentUser.following, ...popularUserIds]),
+    ];
+
+    // Query bài post
+    const posts = await this.postModel.paginate(
+      { user: { $in: targetUserIds } },
+      {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: ['user', 'tags', 'likes'],
+      },
+    );
+
+    return posts;
   }
 }

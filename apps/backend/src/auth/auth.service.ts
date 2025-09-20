@@ -6,6 +6,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { generateAccessToken, generateRefreshToken } from 'src/middlewares/jwt';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -16,10 +17,17 @@ export class AuthService {
   async register(registerAuthDto: RegisterDto) {
     const { username, email, password, fullname, ...userData } =
       registerAuthDto;
-    console.log(username, email, password, fullname);
-    const existingUser = await this.userModel.findOne({ email });
-    if (existingUser) {
+    const existingEmail = await this.userModel.findOne({ email });
+    if (existingEmail) {
       throw new BadRequestException('Email đã tồn tại');
+    }
+    const existingFullname = await this.userModel.findOne({ fullname });
+    if (existingFullname) {
+      throw new BadRequestException('Tên đầy đủ đã tồn tại');
+    }
+    const existingUsername = await this.userModel.findOne({ username });
+    if (existingUsername) {
+      throw new BadRequestException('Tên người dùng đã tồn tại');
     }
     const user = await this.userModel.create({
       ...userData,
@@ -49,6 +57,14 @@ export class AuthService {
         },
         { new: true },
       );
+
+      // res.cookie('refreshToken', refreshToken, {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === 'production', // chỉ bật secure khi chạy https
+      //   sameSite: 'strict',
+      //   // maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      //   maxAge: 1 * 60 * 1000, // 1 phút
+      // });
       return {
         accessToken,
         user: userData,

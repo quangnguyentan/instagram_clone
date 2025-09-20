@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
 import { useContext } from "react";
 import { NotificationContext } from "@/providers/NotificationProvider";
+import { useNavigate } from "@/hooks/useNavigate";
 
 export function useLogin() {
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
@@ -39,6 +40,7 @@ export function useLogin() {
 
 export function useRegister() {
   const notifyRef = useContext(NotificationContext);
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: async (data: {
       email: string;
@@ -56,6 +58,7 @@ export function useRegister() {
           description: "Bạn đã đăng ký thành công",
         });
       }
+      navigate("/");
     },
     onError: (error: any) => {
       if (notifyRef && notifyRef.current) {

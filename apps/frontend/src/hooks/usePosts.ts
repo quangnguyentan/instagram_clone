@@ -15,6 +15,18 @@ export function usePosts(page: number = 1, limit: number = 10) {
   });
 }
 
+export function useFeed(page: number = 1, limit: number = 10) {
+  return useQuery({
+    queryKey: ["feed", page, limit],
+    queryFn: async () => {
+      const res = await api.get<PaginatedResponse<Post>>(
+        `/posts/feed?page=${page}&limit=${limit}`
+      );
+      return res.data;
+    },
+  });
+}
+
 export function usePost(id: string) {
   return useQuery({
     queryKey: ["posts", id],

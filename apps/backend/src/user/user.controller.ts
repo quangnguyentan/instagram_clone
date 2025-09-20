@@ -41,6 +41,42 @@ export class UserController {
     const user = req?.user;
     return await this.userService.profile(user?.userId);
   }
+  @Roles('user', 'admin')
+  @Post('follow/:targetId')
+  async follow(@Req() req: any, @Param('targetId') targetId: string) {
+    const userId = req.user.userId;
+    return await this.userService.follow(userId, targetId);
+  }
+
+  @Roles('user', 'admin')
+  @Post('unfollow/:targetId')
+  async unfollow(@Req() req: any, @Param('targetId') targetId: string) {
+    const userId = req.user.userId;
+    return await this.userService.unfollow(userId, targetId);
+  }
+
+  @Roles('user', 'admin')
+  @Get(':id/followers')
+  async getFollowers(@Param('id') id: string) {
+    return await this.userService.getFollowers(id);
+  }
+
+  @Roles('user', 'admin')
+  @Get(':id/following')
+  async getFollowing(@Param('id') id: string) {
+    return await this.userService.getFollowing(id);
+  }
+
+  @Roles('user', 'admin')
+  @Get('suggestions')
+  async getSuggestions(@Req() req: any) {
+    try {
+      const userId = req?.user?.userId;
+      return await this.userService.getSuggestions(userId);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

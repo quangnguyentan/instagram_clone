@@ -14,7 +14,7 @@ import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
   @Post('register')
   async register(@Body() registerAuthDto: RegisterDto) {
     try {
@@ -39,7 +39,7 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'none',
-        maxAge: 2 * 60 * 1000,
+        maxAge: 2 * 24 * 60 * 60 * 1000, // 2 ngày
       });
       res.json({ message: result.message, accessToken: result.accessToken });
     } catch (error) {

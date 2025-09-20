@@ -26,6 +26,67 @@ export function useUserProfile() {
   });
 }
 
+export function useSuggestions() {
+  return useQuery<User[]>({
+    queryKey: ["suggestions"],
+    queryFn: async (): Promise<User[]> => {
+      const res = await api.get("/user/suggestions");
+      return res.data as User[];
+    },
+  });
+}
+
+export function useFollow(targetId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (): Promise<User> => {
+      const res = await api.post(`/user/follow/${targetId}`);
+      return res.data as User;
+    },
+    onSuccess: () => {
+      // invalidate cache để UI tự cập nhật
+      qc.invalidateQueries({ queryKey: ["user-profile"] });
+      qc.invalidateQueries({ queryKey: ["followers"] });
+      qc.invalidateQueries({ queryKey: ["following"] });
+    },
+  });
+}
+
+export function useUnfollow(targetId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (): Promise<User> => {
+      const res = await api.post(`/user/unfollow/${targetId}`);
+      return res.data as User;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["user-profile"] });
+      qc.invalidateQueries({ queryKey: ["followers"] });
+      qc.invalidateQueries({ queryKey: ["following"] });
+    },
+  });
+}
+
+export function useGetFollowers(id: string) {
+  return useQuery<User[]>({
+    queryKey: ["followers", id],
+    queryFn: async (): Promise<User[]> => {
+      const res = await api.get(`/user/${id}/followers`);
+      return res.data as User[];
+    },
+  });
+}
+
+export function useGetFollowing(id: string) {
+  return useQuery<User[]>({
+    queryKey: ["following", id],
+    queryFn: async (): Promise<User[]> => {
+      const res = await api.get(`/user/${id}/following`);
+      return res.data as User[];
+    },
+  });
+}
+
 // CRUD cho user
 export function useCreateUser() {
   const qc = useQueryClient();
