@@ -3,6 +3,7 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
+  CircleX,
   Clapperboard,
   ClipboardPlus,
   Compass,
@@ -11,6 +12,7 @@ import {
   House,
   ImageIcon,
   Instagram,
+  Loader,
   Menu,
   MessageCircle,
   MessageCircleWarning,
@@ -83,4 +85,11 @@ export const SendIcon = ({ className, ...props }: IconProps) => {
 
 export const EllipsisIcon = ({ className, ...props }: IconProps) => {
   return <Ellipsis className={cn(className)} {...props} />;
+};
+
+export const CloseIcon = ({ className, ...props }: IconProps) => {
+  return <CircleX className={cn(className)} {...props} />;
+};
+export const LoaderIcon = ({ className, ...props }: IconProps) => {
+  return <Loader className={cn(className)} {...props} />;
 };

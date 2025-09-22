@@ -44,7 +44,7 @@ const GlobalModals = () => {
       modalContent={renderModalContent()}
       onOk={closeModal}
       onCancel={closeModal}
-      width={type === "post" || type === "comment" ? "80%" : 400} // Điều chỉnh width cho login
+      width={type === "post" || type === "comment" ? 1280 : 400} // Điều chỉnh width cho login
     />
   );
 };

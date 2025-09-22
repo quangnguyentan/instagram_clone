@@ -122,26 +122,28 @@ export class PostService {
   }
   // post.service.ts
   async getFeed(userId: string, page: number, limit: number) {
-    // Lấy danh sách user mà mình follow
     const currentUser = await this.userModel
       .findById(userId)
       .select('following');
     if (!currentUser) throw new Error('User không tồn tại');
 
-    // Lấy tất cả user có followers > 10
+    // lấy user nổi tiếng
     const popularUsers = await this.userModel
       .find({ $expr: { $gt: [{ $size: '$followers' }, 10] } })
       .select('_id');
-
     const popularUserIds = popularUsers.map((u) => u._id);
 
-    // Hợp mảng userId từ following + popular
+    // thêm cả chính mình vào danh sách
     const targetUserIds = [
-      ...new Set([...currentUser.following, ...popularUserIds]),
+      ...new Set([
+        userId,
+        ...currentUser.following.map((id) => id.toString()),
+        ...popularUserIds.map((id: any) => id.toString()),
+      ]),
     ];
 
-    // Query bài post
-    const posts = await this.postModel.paginate(
+    // query bài viết
+    return this.postModel.paginate(
       { user: { $in: targetUserIds } },
       {
         page,
@@ -150,7 +152,5 @@ export class PostService {
         populate: ['user', 'tags', 'likes'],
       },
     );
-
-    return posts;
   }
 }

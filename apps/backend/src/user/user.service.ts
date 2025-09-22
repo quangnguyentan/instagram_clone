@@ -31,38 +31,51 @@ export class UserService {
       .select('following');
     if (!currentUser) throw new Error('User không tồn tại');
 
-    let suggestions: User[] = [];
+    const excluded = [new Types.ObjectId(userId), ...currentUser.following];
+
+    let candidateIds: Types.ObjectId[] = [];
 
     if (currentUser.following.length > 0) {
-      //  Lấy danh sách bạn bè của những người mình đang follow
+      // Lấy danh sách bạn bè của những người mình follow
       const friendsOfFollowing = await this.userModel.aggregate([
         { $match: { _id: { $in: currentUser.following } } },
-        { $unwind: '$following' },
+        { $unwind: { path: '$following', preserveNullAndEmptyArrays: true } },
         { $group: { _id: null, following: { $addToSet: '$following' } } },
       ]);
 
-      const candidateIds =
+      candidateIds =
         friendsOfFollowing.length > 0 ? friendsOfFollowing[0].following : [];
+    }
 
-      // Loại bỏ chính mình + người đã follow
-      const excluded = [new Types.ObjectId(userId), ...currentUser.following];
+    let suggestions: User[] = [];
 
+    if (candidateIds.length > 0) {
+      // Gợi ý từ bạn của bạn bè
       suggestions = await this.userModel.aggregate([
         { $match: { _id: { $nin: excluded, $in: candidateIds } } },
-        { $sample: { size: limit } }, // random
-        { $project: { password: 0, refreshToken: 0 } },
-      ]);
-    } else {
-      //  Nếu chưa follow ai → random user bất kỳ (trừ chính mình)
-      suggestions = await this.userModel.aggregate([
-        { $match: { _id: { $ne: new Types.ObjectId(userId) } } },
-        { $sample: { size: limit } }, // random
+        { $addFields: { followersCount: { $size: '$followers' } } },
+        { $sort: { followersCount: -1 } },
+        { $limit: limit },
         { $project: { password: 0, refreshToken: 0 } },
       ]);
     }
 
+    // Nếu chưa đủ (hoặc không có) → fallback sang random global
+    if (suggestions.length < limit) {
+      const fallback = await this.userModel.aggregate([
+        { $match: { _id: { $nin: excluded } } },
+        { $addFields: { followersCount: { $size: '$followers' } } },
+        { $sort: { followersCount: -1 } },
+        { $limit: limit - suggestions.length },
+        { $project: { password: 0, refreshToken: 0 } },
+      ]);
+
+      suggestions = [...suggestions, ...fallback];
+    }
+
     return suggestions;
   }
+
   // async getSuggestions(userId: string, limit = 5) {
   //   const currentUser = await this.userModel
   //     .findById(userId)

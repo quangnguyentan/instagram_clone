@@ -6,9 +6,13 @@ import FollowButton from "@/shared/layout/FollowButton";
 
 interface FriendSuggestionsProps {
   suggestions: User[];
+  currentUserId: string;
 }
 
-const FriendSuggestions = ({ suggestions }: FriendSuggestionsProps) => {
+const FriendSuggestions = ({
+  suggestions,
+  currentUserId,
+}: FriendSuggestionsProps) => {
   return (
     <div className="w-full">
       {/* Header */}
@@ -21,9 +25,9 @@ const FriendSuggestions = ({ suggestions }: FriendSuggestionsProps) => {
 
       {/* Friend list */}
       <div className="mt-3 space-y-3">
-        {suggestions?.map((friend) => (
-          <div key={friend._id} className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 min-w-0 flex-1">
+        {suggestions?.map((friend, index) => (
+          <div key={index} className="flex items-center justify-between gap-3">
+            <div className="flex items-center space-x-3 min-w-0 flex-1">
               <div className="w-11 h-11 border rounded-full">
                 <Image
                   src={friend.avatarUrl || defaultSuggestUser}
@@ -42,7 +46,7 @@ const FriendSuggestions = ({ suggestions }: FriendSuggestionsProps) => {
             {/* Follow button */}
             <FollowButton
               targetId={friend._id}
-              isFollowing={friend?.followers?.includes(friend?._id)}
+              isFollowing={friend?.followers?.includes(currentUserId)}
             />
           </div>
         ))}

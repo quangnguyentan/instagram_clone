@@ -4,10 +4,12 @@ import PostCard from "./PostCard";
 
 const Post = ({ posts }: { posts: PostType[] }) => {
   return (
-    <div className="flex flex-col gap-4 max-w-[500px] mx-auto">
-      {posts?.map((post) => (
-        <PostCard key={post?._id} post={post} />
-      ))}
+    <div className="w-full relative">
+      <div className="flex flex-col gap-4 max-w-[500px]  absolute right-0 top-0 translate-x-[-30%]">
+        {posts?.map((post) => (
+          <PostCard key={post?._id} post={post} />
+        ))}
+      </div>
     </div>
   );
 };

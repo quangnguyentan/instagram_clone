@@ -45,7 +45,7 @@ const SidebarMenu = () => {
           <div className="px-3">
             <div className="w-full">
               {searchOpen || notificationOpen ? (
-                <div>
+                <div className="w-28 h-10">
                   <InstagramIcon className="w-6 h-6" />
                 </div>
               ) : (

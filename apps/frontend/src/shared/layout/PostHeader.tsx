@@ -18,7 +18,7 @@ const PostHeader = ({ user, createdAt }: { user: User; createdAt: string }) => {
         <span className="font-medium">{user.username}</span>
         <div className="flex gap-1 items-center">
           <span className="text-gray-500">&bull;</span>
-          <span className="text-gray-500">{label}</span>
+          <span className="text-gray-500">{label} trước</span>
         </div>
       </div>
       <EllipsisIcon className="w-4 h-4" />

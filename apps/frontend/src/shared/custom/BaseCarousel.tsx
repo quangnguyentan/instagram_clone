@@ -58,7 +58,7 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
   const isLastSlide = media ? current === media.length - 1 : false;
 
   return (
-    <div className="w-full relative group">
+    <div className="relative w-full max-w-[1280px] aspect-[1/1] group">
       <Carousel
         arrows={false} // Disable default arrows
         infinite={infinite}
@@ -86,21 +86,21 @@ const BaseCarousel: React.FC<BaseCarouselProps> = ({
           {(!isFirstSlide || infinite) && (
             <button
               className="absolute left-2 top-1/2 -translate-y-1/2 z-10 
-                         bg-black/50 text-white p-2 rounded-full 
-                         opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                         bg-white/70 text-black/70 p-0.5 rounded-full 
+                      opacity-100 transition cursor-pointer"
               onClick={goToPrev}
             >
-              <LeftIcon />
+              <LeftIcon width={22} height={22} />
             </button>
           )}
           {(!isLastSlide || infinite) && (
             <button
               className="absolute right-2 top-1/2 -translate-y-1/2 z-10 
-                         bg-black/50 text-white p-2 rounded-full 
-                         opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                         bg-white/70 text-black/70 p-0.5 rounded-full 
+                      opacity-100 transition cursor-pointer"
               onClick={goToNext}
             >
-              <RightIcon />
+              <RightIcon width={22} height={22} />
             </button>
           )}
         </>

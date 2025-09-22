@@ -10,30 +10,26 @@ interface BaseModalProps {
   buttonClassName?: string;
   buttonLabel?: React.ReactNode;
   buttonType?: "primary" | "dashed" | "link" | "text" | "default";
-  title?: React.ReactNode | string;
   modalContent: React.ReactNode;
   onOk: () => void;
   onCancel: () => void;
   useGlobalState?: boolean;
-  initialType?: string; // Type mặc định khi mở modal global
+  initialType?: string;
   initialData?: any;
-  width?: number | string; // Thêm prop width
-  height?: number | string; // Thêm prop height
+  width?: number | string;
 }
 
 const BaseModal = ({
   buttonClassName,
   buttonLabel,
   buttonType = "primary",
-  title,
   modalContent,
   onOk,
   onCancel,
   useGlobalState = false,
   initialType = "default",
   initialData = null,
-  width = 1000, // Mặc định 1000px
-  height = "auto", // Mặc định tự động điều chỉnh
+  width = 1280,
 }: BaseModalProps) => {
   const { open, setModal, closeModal } = useModalStore();
   const [isLocalOpen, setIsLocalOpen] = React.useState(false);
@@ -57,21 +53,6 @@ const BaseModal = ({
     onCancel();
   };
 
-  const modalStyle = {
-    width:
-      width === "100%"
-        ? "100vw" // Chuyển 100% thành 100vw
-        : typeof width === "number"
-          ? `${width}px` // Chuyển number thành px
-          : width,
-    height:
-      height === "100%"
-        ? "100vh" // Chuyển 100% thành 100vh
-        : height,
-    maxWidth: "100vw", // Giới hạn tối đa là toàn bộ chiều rộng viewport
-    maxHeight: "100vh", // Giới hạn tối đa là toàn bộ chiều cao viewport
-  };
-
   return (
     <>
       {buttonLabel && !useGlobalState && (
@@ -84,7 +65,7 @@ const BaseModal = ({
         </BaseButton>
       )}
       <Modal
-        title={title}
+        title={null}
         open={isOpen}
         onOk={() => {
           onOk();
@@ -93,10 +74,30 @@ const BaseModal = ({
         onCancel={handleClose}
         footer={null}
         closable={true}
+        closeIcon={
+          <span className="text-gray-500 text-xl leading-none">×</span>
+        }
         transitionName="ant-fade"
-        width={width} // Áp dụng width từ prop
-        style={modalStyle}
-        className="p-0! m-0! mx-auto!  "
+        width={width}
+        styles={{
+          body: {
+            height: "auto",
+            padding: 0,
+            display: "block",
+            overflow: "hidden",
+            maxHeight: "90vh",
+            borderRadius: "10px",
+          },
+        }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 1000,
+        }}
+        className="p-0! m-0! ig-modal"
+        getContainer={false}
       >
         {modalContent}
       </Modal>
