@@ -29,18 +29,20 @@ const PostCard = ({ post }: { post: PostType }) => {
   const deleteMutation = useDeleteComment();
   const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
   const [isLiked, setIsLiked] = useState(
-    user ? post.likes.includes(user._id) : false
+    user ? post.likes?.some((likeUser) => likeUser?._id === user._id) : false
   );
   const { openModal } = useOpenModal();
-
-  // ... handlers
 
   const handleOpenCommentModal = () => {
     openModal("comment", {
       // Type động
+      user: post.user,
+      post: post,
       media: post.media,
-      caption: post.caption || "",
-      comments: [], // Nếu có comments từ API
+      comments: comments, // Nếu có comments từ API
+      likes: post.likes,
+      likesCount: likesCount,
+      isLiked: isLiked,
     });
   };
   // comment realtime
@@ -50,7 +52,9 @@ const PostCard = ({ post }: { post: PostType }) => {
   useRealtimeLikes(post._id, (data) => {
     if (data.targetType === "post" && data.targetId === post._id) {
       setLikesCount(data.likesCount);
-      setIsLiked(user ? data.likes.includes(user._id) : false);
+      setIsLiked(
+        user ? data.likes?.some((likeUser) => likeUser === user._id) : false
+      );
     }
   });
 
@@ -77,25 +81,24 @@ const PostCard = ({ post }: { post: PostType }) => {
     const newLikes = isLiked
       ? likes.filter((uid) => uid !== user._id)
       : [...likes, user._id];
-    console.log(newLikes, "newLikes");
     updateMutation.mutate({ id, data: { likes: newLikes } });
   };
 
   const handleLikePost = () => {
     if (!user?._id) return;
+
     toggleLike.mutate({
       targetType: "post",
       targetId: post?._id,
       userId: user?._id,
     });
   };
-
   return (
     <div className="w-full">
       <PostHeader user={post.user} createdAt={post.createdAt} />
       <PostMedia media={post.media} />
       <PostActions
-        liked={isLiked ? [user?._id || ""] : []}
+        liked={isLiked}
         onLike={handleLikePost}
         onComment={handleOpenCommentModal}
         onShare={() => {}}

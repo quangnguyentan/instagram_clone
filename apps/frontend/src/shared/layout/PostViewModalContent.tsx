@@ -1,32 +1,75 @@
 "use client";
 import React from "react";
 import BaseCarousel from "../custom/BaseCarousel";
-import { Media } from "@/types/post.type";
+import { Media, Post } from "@/types/post.type";
+import { User } from "@/types/user.type";
+import Image from "next/image";
+import defaultUser from "@/assets/images/default_user.svg";
+import { Comment } from "@/types/comment.type";
+import PostMeta from "./PostMeta";
 
 interface PostViewModalContentProps {
-  media: Media[];
-  comments?: { user: string; text: string }[];
-  caption?: string;
+  post?: Post;
+  comments?: Comment[];
+  media?: Media[];
+  likes?: User[];
+  likesCount?: number;
+  isLiked?: boolean;
+  user?: User;
 }
 
 const PostViewModalContent: React.FC<PostViewModalContentProps> = ({
-  media,
+  post,
   comments = [],
-  caption,
+  media = [],
+  likes = [],
+  likesCount = 0,
+  isLiked = false,
+  user,
 }) => {
+  console.log(user);
+  console.log(comments);
+  console.log(media);
+  console.log(likes);
+  console.log(likesCount);
+  console.log(isLiked);
   return (
     <div className="flex w-full h-full max-h-[90vh] bg-white rounded-lg overflow-hidden">
       <div className="media-container flex-1 bg-black flex items-center justify-center max-w-[1280px] aspect-[1/1]">
-        <BaseCarousel media={media} arrows dots />
+        <BaseCarousel media={media || []} arrows dots />
       </div>
       <div className="comments-container w-1/3 p-4 overflow-y-auto bg-white min-w-[300px] max-w-[33.333%]">
-        {caption && <p className="mb-4 text-gray-800">{caption}</p>}
-        <h2 className="text-lg font-bold mb-2 text-gray-900">Bình luận</h2>
+        {user && (
+          <div className="flex items-center gap-2">
+            <Image
+              src={user?.avatarUrl || defaultUser}
+              alt={user?.username}
+              width={28}
+              height={28}
+            />
+            <p className="text-gray-800">{user?.fullname}</p>
+          </div>
+        )}
         <div className="space-y-4 max-h-[calc(90vh-140px)] overflow-y-auto">
-          {comments.map((comment, idx) => (
+          {comments?.map((comment, idx) => (
             <div key={idx} className="text-gray-700">
-              <p className="font-semibold">{comment.user}</p>
-              <p>{comment.text}</p>
+              <div className="flex items-center gap-2">
+                <Image
+                  src={comment?.user?.avatarUrl || defaultUser}
+                  alt={comment?.user?.username}
+                  width={28}
+                  height={28}
+                />
+                <div className="flex flex-col">
+                  <p className="font-semibold">{comment?.user?.username}</p>
+                  <p>{comment.content}</p>
+                </div>
+              </div>
+              <PostMeta
+                createdAt={post?.createdAt}
+                likesCount={likesCount}
+                commentsCount={comments.length}
+              />
             </div>
           ))}
         </div>

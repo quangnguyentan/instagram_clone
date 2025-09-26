@@ -4,7 +4,7 @@ import PostSaveAction from "./PostSaveAction";
 import PostShareAction from "./PostShareAction";
 
 interface PostActionsProps {
-  liked: string[];
+  liked: boolean;
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;

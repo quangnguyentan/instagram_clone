@@ -9,6 +9,7 @@ import PostViewModalContent from "./PostViewModalContent";
 
 const GlobalModals = () => {
   const { open, type, data, closeModal } = useModalStore();
+  console.log(data);
   const { accessToken } = useAuthStore();
   const renderModalContent = () => {
     switch (type) {
@@ -18,7 +19,11 @@ const GlobalModals = () => {
           <PostViewModalContent
             media={data?.media || []}
             comments={data?.comments || []}
-            caption={data?.caption}
+            post={data?.post}
+            likes={data?.likes || []}
+            likesCount={data?.likesCount || 0}
+            isLiked={data?.isLiked || false}
+            user={data?.user}
           />
         );
       case "login":

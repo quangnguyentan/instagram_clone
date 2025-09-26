@@ -1,10 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useSocket } from "@/app/features/socket/SocketProvider";
 import { useEffect } from "react";
 import { Like } from "@/types/like.type";
 
 export function useToggleLike() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
       targetType,
@@ -22,6 +23,9 @@ export function useToggleLike() {
       });
       return res.data;
     },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["likes", data.targetId], data);
+    },
   });
 }
 
@@ -30,7 +34,7 @@ export function useRealtimeLikes(
   onLikeUpdate: (data: Like) => void
 ) {
   const socket = useSocket();
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     if (!targetId) return;
 
@@ -39,6 +43,7 @@ export function useRealtimeLikes(
     const handler = (data: Like) => {
       if (data.targetId === targetId) {
         onLikeUpdate(data);
+        queryClient.setQueryData(["likes", data.targetId], data);
       }
     };
 
@@ -48,5 +53,5 @@ export function useRealtimeLikes(
       socket.emit("leave_room", targetId);
       socket.off("like_updated", handler);
     };
-  }, [socket, targetId, onLikeUpdate]);
+  }, [socket, targetId, onLikeUpdate, queryClient]);
 }

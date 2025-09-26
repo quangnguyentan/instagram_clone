@@ -57,7 +57,7 @@ export class LikeService {
     return {
       targetType,
       targetId,
-      likes: doc.likes.map((id: any) => id.toString()),
+      likes: doc.likes,
       likesCount: doc.likes.length,
     };
   }

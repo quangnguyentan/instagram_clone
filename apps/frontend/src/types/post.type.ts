@@ -12,12 +12,11 @@ export interface Post {
   user: User;
   caption?: string;
   media: Media[];
-  likes: string[];
+  likes: User[];
   tags: string[];
   createdAt: string;
   updatedAt: string;
 }
-
 
 export interface PaginatedResponse<T> {
   data: {

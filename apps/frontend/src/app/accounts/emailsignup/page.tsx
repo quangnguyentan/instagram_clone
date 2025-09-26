@@ -1,8 +1,6 @@
 "use client";
 import LoginForm from "@/app/features/auth/components/LoginForm";
-import { useNavigate } from "@/hooks/useNavigate";
-import { useRouter } from "next/navigation";
-import React, { use } from "react";
+import React from "react";
 
 const RegisterEmail = () => {
   return (
