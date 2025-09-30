@@ -43,26 +43,27 @@ export default function StoryCarousel({
   }
 
   return (
-    <div className="w-full h-32 relative ">
-      <div className="flex scrollbar-hide absolute left-0 top-0 translate-x-[60%] gap-4">
+    <div className="w-full py-2 max-w-[600px] mx-auto">
+      <div className="flex gap-4 overflow-x-auto scrollbar-hide px-2">
         {stories.map((story, index) => (
           <button
             key={index}
-            className={`flex flex-col items-center cursor-pointer opacity-0 transform translate-y-4 animate-fadeUp`}
-            // style={{ animationDelay: `${index * 100}ms` }}
+            className="flex flex-col items-center cursor-pointer"
             onClick={() => setActiveStory(story)}
           >
-            <div className="w-16 h-16 rounded-full border-2 border-pink-500 overflow-hidden">
+            <div className="w-16 h-16 rounded-full border-2 border-pink-500 overflow-hidden flex-shrink-0">
               <Image
                 src={story.user.avatarUrl || "/default-avatar.png"}
                 alt={story.user.fullname}
                 className="w-full h-full object-cover"
-                width={32}
-                height={32}
+                width={64}
+                height={64}
                 priority
               />
             </div>
-            <span className="text-xs mt-1">{story.user.fullname}</span>
+            <span className="text-xs mt-1 truncate max-w-[64px] text-center">
+              {story.user.fullname}
+            </span>
           </button>
         ))}
       </div>

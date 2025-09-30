@@ -17,13 +17,22 @@ export default function BasePanel({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        panelRef.current &&
-        !panelRef.current.contains(event.target as Node)
-      ) {
-        onClose?.();
+      const target = event.target as Node;
+      const panel = panelRef.current;
+
+      if (!panel) return;
+
+      const clickX = (event as MouseEvent).clientX;
+
+      // ✅ Nếu click trong panel hoặc trong sidebar (72px) thì KHÔNG đóng
+      if (panel.contains(target) || clickX <= 72) {
+        return;
       }
+
+      // ✅ Click ra ngoài hết → đóng
+      onClose?.();
     }
+
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
     }

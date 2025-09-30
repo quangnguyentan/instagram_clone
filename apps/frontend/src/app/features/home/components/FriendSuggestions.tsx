@@ -16,19 +16,25 @@ const FriendSuggestions = ({
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-between">
         <span className="text-[13px] font-medium text-gray-400">
           Gợi ý cho bạn
         </span>
-        <button className="text-xs font-medium">Xem tất cả</button>
+        <button className="text-xs font-medium hover:underline cursor-pointer">
+          Xem tất cả
+        </button>
       </div>
 
       {/* Friend list */}
       <div className="mt-3 space-y-3">
-        {suggestions?.map((friend, index) => (
-          <div key={index} className="flex items-center justify-between gap-3">
-            <div className="flex items-center space-x-3 min-w-0 flex-1">
-              <div className="w-11 h-11 border rounded-full">
+        {suggestions?.map((friend) => (
+          <div
+            key={friend._id}
+            className="flex items-center justify-between gap-3 w-full"
+          >
+            {/* Avatar + name */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-11 h-11 rounded-full overflow-hidden flex-shrink-0 border">
                 <Image
                   src={friend.avatarUrl || defaultSuggestUser}
                   alt={friend.fullname}
@@ -37,7 +43,6 @@ const FriendSuggestions = ({
                   className="w-full h-full object-cover"
                 />
               </div>
-
               <span className="text-sm font-medium truncate">
                 {friend.fullname}
               </span>

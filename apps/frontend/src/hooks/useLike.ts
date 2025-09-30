@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
-import { useSocket } from "@/app/features/socket/SocketProvider";
+import { useSocket } from "@/providers/SocketProvider";
 import { useEffect } from "react";
 import { Like } from "@/types/like.type";
 

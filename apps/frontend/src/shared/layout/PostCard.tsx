@@ -111,6 +111,7 @@ const PostCard = ({ post }: { post: PostType }) => {
         onUpdate={handleUpdateComment}
         onDelete={handleDeleteComment}
         onLike={handleLikeComment}
+        handleOpenCommentModal={handleOpenCommentModal}
       />
       <PostAddComment onSubmit={handleAddComment} />
     </div>

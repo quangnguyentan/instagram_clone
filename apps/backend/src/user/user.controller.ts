@@ -20,7 +20,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -35,6 +35,17 @@ export class UserController {
       throw new BadRequestException(error.message);
     }
   }
+  @Roles('user', 'admin')
+  @Get()
+  async findByUsername(@Param('username') username: string) {
+    try {
+
+      return await this.userService.findByUsername(username);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   @Roles('user', 'admin')
   @Get('profile')
   async profile(@Req() req: any) {

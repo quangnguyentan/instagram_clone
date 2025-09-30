@@ -5,7 +5,7 @@ export interface Comment {
   _id: string;
   post: Post;
   user: User;
-  parent?: string | null;
+  parent?: Comment;
   content: string;
   likes: string[];
   createdAt: string;

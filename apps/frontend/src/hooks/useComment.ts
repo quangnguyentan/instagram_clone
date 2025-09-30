@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import api from "@/lib/axios"; // axios instance đã config baseURL + token
 import { Comment } from "@/types/comment.type";
-import { useSocket } from "@/app/features/socket/SocketProvider";
+import { useSocket } from "@/providers/SocketProvider";
 
 // API
 const fetchComments = async (postId: string): Promise<Comment[]> => {
@@ -118,5 +118,5 @@ export function useRealtimeComments(postId: string) {
       socket.off("comment.updated");
       socket.off("comment.deleted");
     };
-  }, [postId, queryClient]);
+  }, [postId, queryClient, socket]);
 }

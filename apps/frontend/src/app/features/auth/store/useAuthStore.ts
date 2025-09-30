@@ -6,6 +6,8 @@ import { User } from "@/types/user.type";
 
 interface AuthState {
   user: User | null;
+  sessionId: string | null;
+  setSessionId: (sessionId: string) => void;
   accessToken: string | null;
   setUser: (user: User | null) => void;
   setAccessToken: (token: string | null) => void;
@@ -42,12 +44,14 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      sessionId: null,
+      setSessionId: (sessionId) => set({ sessionId }),
       accessToken: null,
       setUser: (user) => set({ user }),
       setAccessToken: (token) => set({ accessToken: token }),
       logout: () => {
-        set({ user: null, accessToken: null }); // Reset trạng thái
-        encryptedStorage.removeItem("auth-storage"); // Xóa key auth-storage khỏi localStorage
+        set({ user: null, sessionId: null, accessToken: null });
+        useAuthStore.persist.clearStorage();
       },
     }),
     {
@@ -56,6 +60,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         accessToken: state.accessToken,
         user: state.user,
+        sessionId: state.sessionId,
       }),
     }
   )

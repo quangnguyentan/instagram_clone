@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { Media } from "@/types/post.type";
 
@@ -18,7 +18,7 @@ const MediaItem: React.FC<MediaItemProps> = ({ item, refCallback }) => {
   };
 
   return (
-    <div className="relative w-full max-w-[1280px] aspect-[1/1] overflow-hidden">
+    <div className="relative w-full max-w-[1280px] aspect-[4/5] overflow-hidden">
       {item.mediaType === "image" && (
         <Image
           src={item.url}

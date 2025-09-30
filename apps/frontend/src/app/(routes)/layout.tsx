@@ -17,7 +17,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return <LoadingScreen />; // logo Instagram giữa màn hình
   }
 
-  if (!accessToken) {
+  if (!accessToken || !user) {
     return (
       <main className="w-full h-screen flex items-center justify-center">
         <LoginForm
@@ -37,14 +37,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     );
   }
   return (
-    <main className="w-full h-screen flex">
-      <div className="h-full" style={{ width: "300px" }}>
+    <main className="w-full h-screen flex flex-col md:flex-row">
+      {/* Sidebar */}
+      <div className="h-[60px] md:h-full md:w-72 w-full border-b md:border-b-0 md:border-r ">
         <SidebarMenu />
       </div>
-      <div
-        className="h-full flex items-center justify-center"
-        style={{ width: "calc(100% - 300px)" }}
-      >
+
+      {/* Nội dung */}
+      <div className="flex-1 h-full flex items-center justify-center">
         {children}
       </div>
     </main>

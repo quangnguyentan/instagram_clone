@@ -17,6 +17,7 @@ import { NoteModule } from './note/note.module';
 import { LikeModule } from './like/like.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     MessageModule,
     NoteModule,
     LikeModule,
-    CloudinaryModule
+    CloudinaryModule,
+    SessionModule
   ],
   controllers: [AppController],
   providers: [AppService],

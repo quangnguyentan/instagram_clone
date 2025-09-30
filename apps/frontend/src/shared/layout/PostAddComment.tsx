@@ -16,17 +16,22 @@ export default function PostAddComment({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center p-2">
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center relative after:absolute after:content-[''] after:w-full after:h-px after:border-b after:border-gray-300 after:left-0 after:bottom-0 pb-4"
+    >
       <input
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Add a comment..."
-        className="flex-1 border rounded px-2 py-1"
+        placeholder="Bình luận..."
+        className="flex-1 rounded py-1 focus:outline-none text-sm"
       />
-      <button type="submit" className="ml-2 text-blue-500 font-semibold">
-        Post
-      </button>
+      {value?.length >= 1 && (
+        <button type="submit" className="ml-2 text-blue-500 font-semibold">
+          Đăng
+        </button>
+      )}
     </form>
   );
 }

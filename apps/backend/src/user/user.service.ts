@@ -9,7 +9,7 @@ import { Model, Types } from 'mongoose';
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
-  ) {}
+  ) { }
 
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
@@ -18,6 +18,10 @@ export class UserService {
   async findAll() {
     const users = await this.userModel.find();
     return users;
+  }
+  async findByUsername(username: string) {
+    return await this.userModel.findOne({ username }).exec();
+
   }
 
   async profile(userId: string) {

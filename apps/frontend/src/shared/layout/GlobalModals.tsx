@@ -9,7 +9,6 @@ import PostViewModalContent from "./PostViewModalContent";
 
 const GlobalModals = () => {
   const { open, type, data, closeModal } = useModalStore();
-  console.log(data);
   const { accessToken } = useAuthStore();
   const renderModalContent = () => {
     switch (type) {

@@ -26,13 +26,14 @@ const SidebarMenu = () => {
   const { setModal } = useModalStore();
   const { selected, setSelected } = useSeletedMenuStore();
   const logout = useAuthStore((s) => s.logout);
+
   const handleSwitchAccount = () => {
     setModal("login");
   };
   return (
-    <div className="relative h-full py-8">
+    <div className="h-full py-8 w-full flex items-center">
       <motion.div
-        className="flex flex-col justify-between h-full border-r bg-white px-3"
+        className="flex flex-col justify-between h-full bg-white px-3"
         animate={{ width: searchOpen ? 72 : 300 }}
         transition={{
           type: "spring",
@@ -156,7 +157,7 @@ const SidebarMenu = () => {
             </nav>
           </TooltipProvider>
         </div>
-
+        {/* More menu */}
         <BaseDropdown
           items={dropdownItems(logout, handleSwitchAccount)}
           trigger={["click"]}

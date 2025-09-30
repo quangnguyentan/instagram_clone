@@ -1,3 +1,4 @@
+// src/notification/notification.service.ts
 import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,19 +10,26 @@ export class NotificationService {
   constructor(
     @InjectModel(Notification.name)
     private readonly notifModel: Model<Notification>,
-  ) {}
+  ) { }
+
+  async create(dto: CreateNotificationDto) {
+    const created = await this.notifModel.create(dto);
+    return created.populate('fromUser', 'username _id avatar')
+  }
 
   findByUser(userId: string) {
-    return this.notifModel.find({ user: userId }).sort({ createdAt: -1 });
+    return this.notifModel
+      .find({ user: userId })
+      .populate('fromUser', 'username _id avatar')
+      .populate('post', '_id')
+      .sort({ createdAt: -1 });
   }
-  async create(dto: CreateNotificationDto) {
-    return this.notifModel.create(dto);
-  }
+
   markRead(id: string) {
-    return this.notifModel.findByIdAndUpdate(
-      id,
-      { isRead: true },
-      { new: true },
-    );
+    return this.notifModel
+      .findByIdAndUpdate(id, { isRead: true }, { new: true })
+      .populate('fromUser', 'username _id avatar')
+      .populate('post', '_id')
+      .exec();
   }
 }

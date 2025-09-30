@@ -27,7 +27,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/hooks/useOpenModal"
+    "src/hooks/useOpenModal",
+    "src/@types/**/*.d.ts",
+    "src/types/declarations.d.ts"
   ],
   "exclude": ["node_modules"]
 }

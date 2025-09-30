@@ -1,24 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { isMobile } from "react-device-detect";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
 import { useContext } from "react";
 import { NotificationContext } from "@/providers/NotificationProvider";
 import { useNavigate } from "@/hooks/useNavigate";
+import { useSocket } from "@/providers/SocketProvider";
 
 export function useLogin() {
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setUser = useAuthStore((s) => s.setUser);
+  const setSessionId = useAuthStore((s) => s.setSessionId);
   const notifyRef = useContext(NotificationContext);
+  const socket = useSocket();
+
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const res = await api.post("/auth/login", data);
+      const res = await api.post("/auth/login", {
+        ...data,
+        deviceType: isMobile ? "mobile" : "desktop",
+        userAgent: navigator.userAgent,
+        socketId: socket?.id,
+      });
       return res.data;
     },
     onSuccess: (data: any) => {
       setAccessToken(data.accessToken);
       setUser(data.user);
+      setSessionId(data.sessionId);
       if (notifyRef && notifyRef.current) {
         notifyRef.current.success({
           message: "Đăng nhập thành công",
@@ -73,11 +85,32 @@ export function useRegister() {
 }
 
 export function useLogout() {
+  const notifyRef = useContext(NotificationContext);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
-      const res = await api.post("/auth/logout");
-      useAuthStore.getState().logout();
+      const res = await api.post("/auth/logout", {}, { withCredentials: true });
       return res.data;
+    },
+    onSuccess: () => {
+      useAuthStore.getState().logout();
+      if (notifyRef && notifyRef.current) {
+        notifyRef.current.success({
+          message: "Đăng xuất thành công",
+          description: "Bạn đã đăng xuất khỏi hệ thống",
+        });
+      }
+      queryClient.invalidateQueries(); // Làm mới dữ liệu
+      navigate("/"); // Điều hướng mượt mà
+    },
+    onError: (error: any) => {
+      if (notifyRef && notifyRef.current) {
+        notifyRef.current.error({
+          message: "Đăng xuất thất bại",
+          description: error?.response?.data?.message || "Có lỗi khi đăng xuất",
+        });
+      }
     },
   });
 }

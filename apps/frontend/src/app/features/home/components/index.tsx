@@ -63,39 +63,6 @@ export const storiesData: Story[] = [
     mediaType: "video",
     viewers: ["u1", "u2", "u3"],
   },
-  {
-    _id: "s4",
-    user: {
-      _id: "u4",
-      fullname: "Minh Lê",
-      avatarUrl: "/avatars/minh.png",
-    },
-    mediaUrl: "/stories/story4.mp4",
-    mediaType: "video",
-    viewers: ["u1", "u2", "u3"],
-  },
-  {
-    _id: "s4",
-    user: {
-      _id: "u4",
-      fullname: "Minh Lê",
-      avatarUrl: "/avatars/minh.png",
-    },
-    mediaUrl: "/stories/story4.mp4",
-    mediaType: "video",
-    viewers: ["u1", "u2", "u3"],
-  },
-  {
-    _id: "s4",
-    user: {
-      _id: "u4",
-      fullname: "Minh Lê",
-      avatarUrl: "/avatars/minh.png",
-    },
-    mediaUrl: "/stories/story4.mp4",
-    mediaType: "video",
-    viewers: ["u1", "u2", "u3"],
-  },
 ];
 
 export default function HomePage() {
@@ -115,20 +82,20 @@ export default function HomePage() {
     isFollowersLoading ||
     isFollowingLoading;
   return isLoading ? (
-    <div className="h-full w-full flex items-start overflow-y-auto py-8 scrollbar-hide relative">
+    <div className="h-full w-full flex flex-col lg:flex-row justify-center items-start overflow-y-auto py-8 scrollbar-hide relative gap-8">
       <InstagramSkeleton loading={true} count={3} />
     </div>
   ) : (
-    <div className="h-full w-full flex items-start overflow-y-auto py-8 scrollbar-hide relative">
-      <div
-        className="h-full mx-auto w-full"
-        style={{ width: "calc(100% - 600px)" }}
-      >
+    <div className="h-full w-full flex flex-col lg:flex-row justify-center items-start overflow-y-auto py-8 scrollbar-hide relative gap-8 ">
+      {/* Feed */}
+      <div className="flex-1 w-full max-w-[700px]">
         <StoryCarousel stories={storiesData} />
         <Post posts={feed?.data?.docs || []} />
       </div>
-      <div className="h-full" style={{ width: "600px" }}>
-        <div className="w-1/2 flex flex-col gap-4">
+
+      {/* Sidebar phải */}
+      <div className="hidden lg:block w-[320px] flex-shrink-0">
+        <div className="flex flex-col gap-6 sticky top-8 right-0">
           <AccountSwitcher user={user as User} />
           <FriendSuggestions
             suggestions={suggestions || []}
