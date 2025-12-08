@@ -15,18 +15,26 @@ import SearchPanel from "./SearchPanel";
 import useSeletedMenuStore from "@/stores/selectedMenuStore";
 import { motion } from "framer-motion";
 import BaseDropdown from "../custom/BaseDropdown";
-import { useAuthStore } from "@/app/features/auth/store/useAuthStore";
 import { dropdownItems } from "@/lib/dropdownItems";
 import useModalStore from "@/stores/modalStore";
 import NotificationPanel from "./NotificationPanel";
+import ConversationSidebar from "@/app/features/messages/components/ConversationSidebar";
+import useSidebarStore from "@/stores/sidebarStore";
+
+import { useLogout } from "@/app/features/auth/hooks/useAuth";
 
 const SidebarMenu = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const { setModal } = useModalStore();
+  const { isOpenLabel, setIsOpenLabel } = useSidebarStore();
   const { selected, setSelected } = useSeletedMenuStore();
-  const logout = useAuthStore((s) => s.logout);
+  const { setModal } = useModalStore();
 
+  const { mutate: logout } = useLogout();
+
+  const handleLogout = () => {
+    logout();
+  };
   const handleSwitchAccount = () => {
     setModal("login");
   };
@@ -45,7 +53,7 @@ const SidebarMenu = () => {
         <div className="flex flex-col gap-6">
           <div className="px-3">
             <div className="w-full">
-              {searchOpen || notificationOpen ? (
+              {searchOpen || notificationOpen || !isOpenLabel ? (
                 <div className="w-28 h-10">
                   <InstagramIcon className="w-6 h-6" />
                 </div>
@@ -78,7 +86,7 @@ const SidebarMenu = () => {
                             : "fill-none stroke-current"
                         }`}
                       />
-                      {!searchOpen && !notificationOpen && (
+                      {!searchOpen && !notificationOpen && isOpenLabel && (
                         <span
                           className={`text-base truncate ${
                             selected === label ? "font-medium" : "font-normal"
@@ -106,7 +114,7 @@ const SidebarMenu = () => {
                             : "fill-none stroke-current"
                         }`}
                       />
-                      {!notificationOpen && !searchOpen && (
+                      {!notificationOpen && !searchOpen && isOpenLabel && (
                         <span
                           className={`text-base truncate  ${
                             selected === label ? "font-medium" : "font-normal"
@@ -124,6 +132,11 @@ const SidebarMenu = () => {
                       <Link
                         onClick={() => {
                           setSelected(label);
+                          if (label === "Tin nhắn") {
+                            setIsOpenLabel(false);
+                          } else {
+                            setIsOpenLabel(true);
+                          }
                           setSearchOpen(false);
                           setNotificationOpen(false);
                         }}
@@ -137,7 +150,7 @@ const SidebarMenu = () => {
                               : "fill-none stroke-current"
                           }`}
                         />
-                        {!searchOpen && !notificationOpen && (
+                        {!searchOpen && !notificationOpen && isOpenLabel && (
                           <span
                             className={`text-base truncate ${
                               selected === label ? "font-medium" : "font-normal"
@@ -159,7 +172,7 @@ const SidebarMenu = () => {
         </div>
         {/* More menu */}
         <BaseDropdown
-          items={dropdownItems(logout, handleSwitchAccount)}
+          items={dropdownItems(handleLogout, handleSwitchAccount)}
           trigger={["click"]}
           className="hover:bg-muted py-3 px-3 rounded-sm w-full flex items-center cursor-pointer"
         >
@@ -172,7 +185,7 @@ const SidebarMenu = () => {
             }}
           >
             <MenuIcon className="w-6 h-6" />
-            {!searchOpen && !notificationOpen && (
+            {!searchOpen && !notificationOpen && isOpenLabel && (
               <span
                 className={`text-base truncate ${
                   selected === "Xem thêm" ? "font-medium" : "font-normal"
@@ -190,6 +203,7 @@ const SidebarMenu = () => {
         open={notificationOpen}
         onClose={() => setNotificationOpen(false)}
       />
+      <ConversationSidebar open={!isOpenLabel} onClose={() => {}} />
     </div>
   );
 };

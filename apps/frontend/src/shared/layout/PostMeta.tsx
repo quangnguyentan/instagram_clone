@@ -1,32 +1,28 @@
 "use client";
-import { useTimeAgo } from "@/hooks/useTimeAgo";
 import { Comment } from "@/types/comment.type";
 import React from "react";
 
 interface PostMetaProps {
   createdAt?: string;
   likesCount?: number;
-  commentsCount?: number;
   repliesCount?: number;
   handleReply?: (comment: Comment) => void;
-  onToggleReplies?: () => void; // 👈
+  onToggleReplies?: () => void;
   isExpanded?: boolean;
 }
 
 const PostMeta: React.FC<PostMetaProps> = ({
   createdAt,
   likesCount = 0,
-  commentsCount = 0,
   repliesCount = 0,
   handleReply,
   onToggleReplies,
   isExpanded = false,
 }) => {
-  const label = useTimeAgo(createdAt || "");
   return (
     <div className="text-sm text-gray-500 mt-2 space-y-1">
       <div className="flex items-center gap-3">
-        {createdAt && <span className="text-xs">{label}</span>}
+        {createdAt && <span className="text-xs">{createdAt}</span>}
         {likesCount > 0 && (
           <span className="text-xs cursor-pointer">
             {likesCount.toLocaleString()} lượt thích

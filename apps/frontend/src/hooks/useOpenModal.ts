@@ -7,8 +7,8 @@ const useOpenModal = () => {
   const { setModal, closeModal } = useModalStore();
 
   const openModal = useCallback(
-    (type: string, data?: any) => {
-      setModal(type, data);
+    (type: string, data?: any, action?: string) => {
+      setModal(type, data, action);
     },
     [setModal]
   );

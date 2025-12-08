@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import { User } from "@/types/user.type";
-import defaultSuggestUser from "@/assets/images/default_suggest_user.jpg";
+import defaultSuggestUser from "@/assets/images/avatar_default.jpg";
 import FollowButton from "@/shared/layout/FollowButton";
 
 interface FriendSuggestionsProps {
@@ -27,9 +27,9 @@ const FriendSuggestions = ({
 
       {/* Friend list */}
       <div className="mt-3 space-y-3">
-        {suggestions?.map((friend) => (
+        {suggestions?.map((friend, idx) => (
           <div
-            key={friend._id}
+            key={idx}
             className="flex items-center justify-between gap-3 w-full"
           >
             {/* Avatar + name */}

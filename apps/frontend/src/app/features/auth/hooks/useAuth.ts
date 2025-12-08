@@ -88,23 +88,28 @@ export function useLogout() {
   const notifyRef = useContext(NotificationContext);
   const navigate = useNavigate();
   const queryClient = useQueryClient()
+  const socket = useSocket(); // Lấy socket từ context
   return useMutation({
     mutationFn: async () => {
+      queryClient.cancelQueries(); // Hủy tất cả query đang chờ
+      useAuthStore.getState().setManualLogout(true); // Đặt cờ trước khi gọi API
       const res = await api.post("/auth/logout", {}, { withCredentials: true });
       return res.data;
     },
     onSuccess: () => {
       useAuthStore.getState().logout();
+      socket.disconnect(); // Ngắt kết nối socket
       if (notifyRef && notifyRef.current) {
         notifyRef.current.success({
           message: "Đăng xuất thành công",
           description: "Bạn đã đăng xuất khỏi hệ thống",
         });
       }
-      queryClient.invalidateQueries(); // Làm mới dữ liệu
-      navigate("/"); // Điều hướng mượt mà
+      queryClient.clear(); // Xóa cache thay vì invalidateQueries
+      navigate("/", { replace: true }); // Điều hướng về trang chủ
     },
     onError: (error: any) => {
+      useAuthStore.getState().setManualLogout(false);
       if (notifyRef && notifyRef.current) {
         notifyRef.current.error({
           message: "Đăng xuất thất bại",
@@ -112,6 +117,7 @@ export function useLogout() {
         });
       }
     },
+
   });
 }
 

@@ -5,6 +5,7 @@ import { NotificationProvider } from "@/providers/NotificationProvider";
 import { SocketProvider } from "../providers/SocketProvider";
 import GlobalModals from "@/shared/layout/GlobalModals";
 import ClientInitializer from "@/providers/ClientInitializer";
+import { NProgressBar } from "@/shared/layout/NProgressBar";
 
 export const metadata: Metadata = {
   title: "Instagram",
@@ -25,6 +26,7 @@ export default function RootLayout({
         <Providers>
           <SocketProvider>
             <NotificationProvider>
+              <NProgressBar />
               <ClientInitializer />
               {children}
               <GlobalModals />

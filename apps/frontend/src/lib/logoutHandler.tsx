@@ -17,6 +17,7 @@ export const setLogoutContext = (
 };
 
 export const globalLogout = (reason?: string) => {
+  console.log("globalLogout called:", { reason });
   // clear auth store
   useAuthStore.getState().logout();
 

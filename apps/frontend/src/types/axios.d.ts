@@ -1,7 +1,8 @@
-import 'axios';
+import "axios";
 
-declare module 'axios' {
+declare module "axios" {
     export interface AxiosRequestConfig {
-        handlerEnabled?: boolean;
+        skipInterceptor?: boolean;
+        _retry?: boolean;
     }
 }

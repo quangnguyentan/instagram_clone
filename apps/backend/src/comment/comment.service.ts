@@ -72,6 +72,7 @@ export class CommentService {
       .find({ post: postId })
       .populate('user', 'username _id avatar') // lấy các field cần
       .populate('parent', 'user') // lấy các field cần
+      .sort({ createdAt: -1 })
       .exec();
   }
 

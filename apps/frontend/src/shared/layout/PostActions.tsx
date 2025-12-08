@@ -5,6 +5,7 @@ import PostShareAction from "./PostShareAction";
 
 interface PostActionsProps {
   liked: boolean;
+  isBookmarked: boolean;
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
@@ -13,6 +14,7 @@ interface PostActionsProps {
 
 const PostActions = ({
   liked,
+  isBookmarked,
   onLike,
   onComment,
   onShare,
@@ -26,7 +28,7 @@ const PostActions = ({
         <PostShareAction onShare={onShare} />
       </div>
       <div>
-        <PostSaveAction onSave={onSave} />
+        <PostSaveAction onSave={onSave} isBookmarked={isBookmarked} />
       </div>
     </div>
   );

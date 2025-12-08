@@ -8,7 +8,7 @@ const SocketContext = createContext<Socket | null>(null);
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const socketRef = useRef<Socket | null>(null);
-  const { sessionId } = useAuthStore((state) => state);
+  const { sessionId, isManualLogout } = useAuthStore((state) => state);
 
   if (!socketRef.current) {
     socketRef.current = io(
@@ -25,6 +25,10 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const handleForceLogout = (data: { reason?: string }) => {
+      if (isManualLogout) {
+        console.log("Bỏ qua force_logout vì vừa đăng xuất chủ động", { data });
+        return;
+      }
       globalLogout(
         data?.reason || "Bạn đã bị đăng xuất do đăng nhập ở thiết bị khác."
       );
@@ -39,8 +43,10 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       if (sessionId) {
         socket.emit("unregister_session", sessionId);
       }
+      socket.disconnect();
+      socketRef.current = null;
     };
-  }, [sessionId]);
+  }, [sessionId, isManualLogout, socket]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

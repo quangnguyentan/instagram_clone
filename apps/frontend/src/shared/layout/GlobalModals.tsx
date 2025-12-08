@@ -10,18 +10,15 @@ import PostViewModalContent from "./PostViewModalContent";
 const GlobalModals = () => {
   const { open, type, data, closeModal } = useModalStore();
   const { accessToken } = useAuthStore();
+
   const renderModalContent = () => {
     switch (type) {
       case "post":
       case "comment":
         return (
           <PostViewModalContent
-            media={data?.media || []}
-            comments={data?.comments || []}
             post={data?.post}
-            likes={data?.likes || []}
-            likesCount={data?.likesCount || 0}
-            isLiked={data?.isLiked || false}
+            media={data?.media}
             user={data?.user}
           />
         );

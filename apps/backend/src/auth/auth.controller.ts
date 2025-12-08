@@ -36,16 +36,6 @@ export class AuthController {
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     try {
       const result = await this.authService.refresh(req);
-      const refreshMaxAge = parseExpireToMs(
-        process.env.JWT_REFRESH_EXPIRE,
-        7 * 24 * 60 * 60 * 1000
-      );
-      res.cookie('accessToken', result.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none',
-        maxAge: refreshMaxAge,
-      });
       return { message: result.message, accessToken: result.accessToken };
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -56,6 +46,7 @@ export class AuthController {
     try {
       return await this.authService.logout(req, res);
     } catch (error) {
+
       throw new BadRequestException(error.message);
     }
   }

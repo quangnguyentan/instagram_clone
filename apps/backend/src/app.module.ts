@@ -18,6 +18,7 @@ import { LikeModule } from './like/like.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SessionModule } from './session/session.module';
+import { BookmarkModule } from './bookmark/bookmark.module';
 
 @Module({
   imports: [
@@ -45,7 +46,8 @@ import { SessionModule } from './session/session.module';
     NoteModule,
     LikeModule,
     CloudinaryModule,
-    SessionModule
+    SessionModule,
+    BookmarkModule
   ],
   controllers: [AppController],
   providers: [AppService],

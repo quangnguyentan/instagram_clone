@@ -27,6 +27,12 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      const isManualLogout = useAuthStore.getState().isManualLogout;
+
+      if (isManualLogout) {
+        // Bỏ qua lỗi 401 nếu vừa đăng xuất chủ động
+        return Promise.reject(error);
+      }
       if (!refreshTokenPromise) {
         refreshTokenPromise = (api
           .get<{ accessToken: string }>("/auth/refresh")
@@ -37,7 +43,9 @@ api.interceptors.response.use(
             return newToken; // <-- trả về string
           })
           .catch((err) => {
+
             refreshTokenPromise = null;
+            useAuthStore.getState().setManualLogout(false);
             globalLogout("Phiên đăng nhập hết hạn");
             throw err;
           })) as Promise<string>; // ép kiểu cho chắc

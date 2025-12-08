@@ -13,6 +13,7 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
   open,
   onOk,
 }) => {
+  if (!open) return null;
   return (
     <Modal
       open={open}

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import defaultUser from "@/assets/images/default_user.svg";
+import defaultUser from "@/assets/images/avatar_default.jpg";
 import Image from "next/image";
 import useOpenModal from "@/hooks/useOpenModal";
 import { User } from "@/types/user.type";

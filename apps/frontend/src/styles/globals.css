@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
+@import "nprogress/nprogress.css";
 @custom-variant dark (&:is(.dark *));
 @config "../../tailwind.config.js";
 
@@ -126,8 +126,8 @@
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE, Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Target only default slick arrows, not custom ones */
@@ -224,4 +224,22 @@ button.slick-next[type="button"] {
 
 .animate-fadeUp {
   animation: fadeUp 0.3s forwards;
+}
+
+#nprogress .bar {
+  background: linear-gradient(
+    90deg,
+    #feda75,
+    #fa7e1e,
+    #d62976,
+    #962fbf,
+    #4f5bd5
+  ) !important;
+  height: 1.5px !important;
+}
+
+#nprogress .peg {
+  box-shadow:
+    0 0 10px #d62976,
+    0 0 5px #fa7e1e !important;
 }

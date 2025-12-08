@@ -9,6 +9,7 @@ import { generateAccessToken, generateRefreshToken, verifyToken } from 'src/midd
 import { Response } from 'express';
 import { SessionsService } from 'src/session/session.service';
 import { SessionGateway } from 'src/session/session.gateway';
+import { parseExpireToMs } from 'src/utils/time';
 
 @Injectable()
 export class AuthService {
@@ -69,7 +70,6 @@ export class AuthService {
     const revokeResult = await this.sessionsService.revokeByUserAndDevice(user?._id?.toString() as any, deviceType);
     if (revokeResult?.modifiedCount > 0) {
       const oldSessions = await this.sessionsService.listActiveSessionsByDevice(user?._id?.toString() as any, deviceType);
-      console.log(oldSessions);
       oldSessions.forEach((oldSession) => {
         if (oldSession.socketId) {
           this.sessionGateway.forceLogout(oldSession.socketId, "Bạn đã bị đăng xuất do đăng nhập ở thiết bị khác.");
@@ -105,8 +105,9 @@ export class AuthService {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
+      maxAge: parseExpireToMs(process.env.JWT_REFRESH_EXPIRE, 7 * 24 * 60 * 60 * 1000)
     });
 
     // update refreshToken field on user
@@ -138,7 +139,6 @@ export class AuthService {
     if (!session || session.revoked) {
       throw new BadRequestException('Session revoked or not found');
     }
-    console.log(payload, "payload code");
     const accessToken = generateAccessToken(payload.uid, payload.roles?.[0], payload.email, payload.sid);
 
     return {
@@ -149,19 +149,19 @@ export class AuthService {
 
   async logout(req, res) {
     const { refreshToken } = req.cookies;
-    console.log(refreshToken, "refreshToken logout");
     if (!refreshToken) {
-      throw new BadRequestException('Không tìm thấy refresh token');
+      res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict', secure: true });
+      return { message: 'Logged out successfully' };
     }
     let payload: any;
     try {
       payload = verifyToken(refreshToken);
     } catch {
-      throw new BadRequestException('Refresh token không hợp lệ');
+      res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict', secure: true });
+      return { message: 'Logged out successfully' };
     }
 
     // Xóa session trong DB
-    console.log(payload, "payload logout");
     if (payload.sid) {
       await Promise.all([
         this.sessionsService.revokeById(payload.sid),

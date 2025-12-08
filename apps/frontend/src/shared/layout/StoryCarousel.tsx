@@ -18,7 +18,7 @@ export default function StoryCarousel({
     {
       url: story.mediaUrl,
       type: story.mediaType === "video" ? "video" : "image",
-      duration: 5000,
+      duration: story.mediaType === "video" ? undefined : 5000,
     },
   ];
 

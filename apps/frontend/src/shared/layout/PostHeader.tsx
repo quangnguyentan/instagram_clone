@@ -1,7 +1,7 @@
 import { User } from "@/types/user.type";
 import Image from "next/image";
 import React from "react";
-import defaultUser from "@/assets/images/default_user.svg";
+import defaultUser from "@/assets/images/avatar_default.jpg";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
 import { EllipsisIcon } from "../ui/Icon";
 const PostHeader = ({ user, createdAt }: { user: User; createdAt: string }) => {
@@ -14,6 +14,7 @@ const PostHeader = ({ user, createdAt }: { user: User; createdAt: string }) => {
           alt={user.username}
           width={28}
           height={28}
+          className="rounded-full"
         />
         <span className="font-medium">{user.username}</span>
         <div className="flex gap-1 items-center">

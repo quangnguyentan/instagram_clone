@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { Post as PostType } from "@/types/post.type";
 import PostMedia from "./PostMedia";
 import PostActions from "./PostActions";
@@ -19,79 +19,107 @@ import {
 } from "@/hooks/useComment";
 import { useToggleLike, useRealtimeLikes } from "@/hooks/useLike";
 import useOpenModal from "@/hooks/useOpenModal";
+import {
+  useCheckBookmark,
+  useCreateBookmark,
+  useDeleteBookmark,
+} from "@/hooks/useBookmarks";
+
+import { usePostState } from "@/hooks/usePostState";
 
 const PostCard = ({ post }: { post: PostType }) => {
-  const { data: comments = [] } = useComments(post._id);
   const { user } = useAuthStore();
-  const toggleLike = useToggleLike();
+  const { data: comments = [] } = useComments(post._id);
+  const { data: bookmark } = useCheckBookmark(post._id);
+
   const createMutation = useCreateComment();
   const updateMutation = useUpdateComment();
   const deleteMutation = useDeleteComment();
-  const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
-  const [isLiked, setIsLiked] = useState(
-    user ? post.likes?.some((likeUser) => likeUser?._id === user._id) : false
-  );
+  const createBookmark = useCreateBookmark();
+  const deleteBookmark = useDeleteBookmark();
   const { openModal } = useOpenModal();
 
-  const handleOpenCommentModal = () => {
-    openModal("comment", {
-      // Type động
-      user: post.user,
-      post: post,
-      media: post.media,
-      comments: comments, // Nếu có comments từ API
-      likes: post.likes,
-      likesCount: likesCount,
-      isLiked: isLiked,
-    });
-  };
-  // comment realtime
+  const {
+    isLiked,
+    likesCount,
+    isBookmarked,
+    comments: storeComments,
+    setLike,
+    setLikesCount,
+    setBookmark,
+    toggleComment,
+    removeComment,
+    replaceComment,
+    handleLikePostToggle,
+  } = usePostState(post, user, bookmark);
   useRealtimeComments(post._id);
-
-  // like realtime
   useRealtimeLikes(post._id, (data) => {
     if (data.targetType === "post" && data.targetId === post._id) {
-      setLikesCount(data.likesCount);
-      setIsLiked(
+      setLikesCount(post._id, data.likesCount);
+      setLike(
+        post._id,
         user ? data.likes?.some((likeUser) => likeUser === user._id) : false
       );
     }
   });
 
-  const handleAddComment = (content: string) => {
-    if (!user?._id) return;
-    createMutation.mutate({
-      post: post._id,
-      user: user._id,
-      content,
-    });
+  const handleSavePostToggle = () => {
+    if (isBookmarked) {
+      setBookmark(post._id, false);
+      deleteBookmark.mutate(post._id, {
+        onError: () => setBookmark(post._id, true),
+      });
+    } else {
+      setBookmark(post._id, true);
+      createBookmark.mutate(post._id, {
+        onError: () => setBookmark(post._id, false),
+      });
+    }
+  };
+  const handleOpenCommentModal = () => {
+    openModal(
+      "comment",
+      {
+        user: post.user,
+        post,
+        media: post.media,
+        // comments: storeComments,
+        // likesCount,
+        // isLiked,
+        // isBookmarked,
+        // onLike: handleLikePost,
+        // onSave: handleSavePostToggle,
+      },
+      "focus"
+    );
   };
 
-  const handleUpdateComment = (id: string, content: string) => {
-    updateMutation.mutate({ id, data: { content } });
-  };
+  const handleCommentSubmit = (content: string) => {
+    if (!user?._id || !post._id) return;
 
-  const handleDeleteComment = (id: string) => {
-    deleteMutation.mutate({ id, postId: post._id });
-  };
+    const tempCommentId = toggleComment(content);
 
-  const handleLikeComment = (id: string, likes: string[]) => {
-    if (!user?._id) return;
-    const isLiked = likes.includes(user._id);
-    const newLikes = isLiked
-      ? likes.filter((uid) => uid !== user._id)
-      : [...likes, user._id];
-    updateMutation.mutate({ id, data: { likes: newLikes } });
-  };
-
-  const handleLikePost = () => {
-    if (!user?._id) return;
-
-    toggleLike.mutate({
-      targetType: "post",
-      targetId: post?._id,
-      userId: user?._id,
-    });
+    createMutation.mutate(
+      {
+        post: post._id,
+        user: user._id,
+        content,
+      },
+      {
+        onSuccess: (newComment) => {
+          // Replace temporary comment with real comment
+          if (tempCommentId) {
+            replaceComment(tempCommentId, newComment);
+          }
+        },
+        onError: () => {
+          // Rollback on error
+          if (tempCommentId) {
+            removeComment(post._id, tempCommentId);
+          }
+        },
+      }
+    );
   };
   return (
     <div className="w-full">
@@ -99,21 +127,31 @@ const PostCard = ({ post }: { post: PostType }) => {
       <PostMedia media={post.media} />
       <PostActions
         liked={isLiked}
-        onLike={handleLikePost}
+        onLike={() => handleLikePostToggle(post._id, user?._id as string)}
         onComment={handleOpenCommentModal}
         onShare={() => {}}
-        onSave={() => {}}
+        onSave={handleSavePostToggle}
+        isBookmarked={isBookmarked}
       />
       <PostLikes count={likesCount} />
       <PostCaption user={post.user} caption={post.caption || ""} />
       <PostCommentsPreview
         comments={comments}
-        onUpdate={handleUpdateComment}
-        onDelete={handleDeleteComment}
-        onLike={handleLikeComment}
+        onUpdate={(id, content) =>
+          updateMutation.mutate({ id, data: { content } })
+        }
+        onDelete={(id) => deleteMutation.mutate({ id, postId: post._id })}
+        onLike={(id, likes) => {
+          if (!user?._id) return;
+          const isLiked = likes.includes(user._id);
+          const newLikes = isLiked
+            ? likes.filter((uid) => uid !== user._id)
+            : [...likes, user._id];
+          updateMutation.mutate({ id, data: { likes: newLikes } });
+        }}
         handleOpenCommentModal={handleOpenCommentModal}
       />
-      <PostAddComment onSubmit={handleAddComment} />
+      <PostAddComment onSubmit={handleCommentSubmit} />
     </div>
   );
 };

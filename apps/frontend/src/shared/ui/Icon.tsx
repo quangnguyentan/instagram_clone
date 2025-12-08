@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import {
   Bookmark,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CircleX,
@@ -15,11 +16,13 @@ import {
   Loader,
   Menu,
   MessageCircle,
+  MessageCircleCode,
   MessageCircleWarning,
   Moon,
   Search,
   Send,
   Settings,
+  SquarePen,
   Sun,
   UserRound,
 } from "lucide-react";
@@ -92,4 +95,13 @@ export const CloseIcon = ({ className, ...props }: IconProps) => {
 };
 export const LoaderIcon = ({ className, ...props }: IconProps) => {
   return <Loader className={cn(className)} {...props} />;
+};
+export const MessageCircleIcon = ({ className, ...props }: IconProps) => {
+  return <MessageCircleCode className={cn(className)} {...props} />;
+};
+export const SquarePenIcon = ({ className, ...props }: IconProps) => {
+  return <SquarePen className={cn(className)} {...props} />;
+};
+export const ChevronDownIcon = ({ className, ...props }: IconProps) => {
+  return <ChevronDown className={cn(className)} {...props} />;
 };

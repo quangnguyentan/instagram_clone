@@ -87,13 +87,11 @@ export default function HomePage() {
     </div>
   ) : (
     <div className="h-full w-full flex flex-col lg:flex-row justify-center items-start overflow-y-auto py-8 scrollbar-hide relative gap-8 ">
-      {/* Feed */}
       <div className="flex-1 w-full max-w-[700px]">
         <StoryCarousel stories={storiesData} />
         <Post posts={feed?.data?.docs || []} />
       </div>
 
-      {/* Sidebar phải */}
       <div className="hidden lg:block w-[320px] flex-shrink-0">
         <div className="flex flex-col gap-6 sticky top-8 right-0">
           <AccountSwitcher user={user as User} />

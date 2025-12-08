@@ -3,19 +3,22 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import CryptoJS from "crypto-js";
 import { User } from "@/types/user.type";
+import useSeletedMenuStore from "@/stores/selectedMenuStore";
+import useSidebarStore from "@/stores/sidebarStore";
 
 interface AuthState {
   user: User | null;
   sessionId: string | null;
+  isManualLogout: boolean; // Thêm trạng thái này
   setSessionId: (sessionId: string) => void;
   accessToken: string | null;
   setUser: (user: User | null) => void;
   setAccessToken: (token: string | null) => void;
+  setManualLogout: (value: boolean) => void; // Thêm hàm này
   logout: () => void;
 }
 
 const SECRET = process.env.NEXT_PUBLIC_AUTH_SECRET || "my-secret-key";
-
 const encryptedStorage = {
   getItem: (name: string): string | null => {
     const str = localStorage.getItem(name);
@@ -45,13 +48,18 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       sessionId: null,
+      isManualLogout: false, // Khởi tạo
       setSessionId: (sessionId) => set({ sessionId }),
       accessToken: null,
-      setUser: (user) => set({ user }),
+      setUser: (user) => set({ user, isManualLogout: false }),
       setAccessToken: (token) => set({ accessToken: token }),
+      setManualLogout: (value) => set({ isManualLogout: value }), // Thêm hàm này
       logout: () => {
-        set({ user: null, sessionId: null, accessToken: null });
+        set({ user: null, sessionId: null, accessToken: null, isManualLogout: true });
         useAuthStore.persist.clearStorage();
+        useSeletedMenuStore.getState().resetSelected();
+        useSidebarStore.getState().resetSidebar();
+
       },
     }),
     {
@@ -61,6 +69,7 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         user: state.user,
         sessionId: state.sessionId,
+        isManualLogout: state.isManualLogout,
       }),
     }
   )

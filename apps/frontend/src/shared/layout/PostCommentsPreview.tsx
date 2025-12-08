@@ -23,7 +23,14 @@ const PostCommentsPreview = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   if (!comments?.length) {
-    return <div className="text-sm text-gray-500">No comments yet</div>;
+    return (
+      <div
+        className="text-sm text-gray-500 cursor-pointer"
+        onClick={handleOpenCommentModal}
+      >
+        0 bình luận
+      </div>
+    );
   }
 
   const handleEdit = (id: string, content: string) => {
