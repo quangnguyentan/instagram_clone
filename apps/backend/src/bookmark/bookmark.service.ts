@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Bookmark } from './entities/bookmark.entity';
+import { Reel } from 'src/reel/entities/reel.entity';
 
 @Injectable()
 export class BookmarkService {
   constructor(
     @InjectModel(Bookmark.name) private bookmarkModel: Model<Bookmark>,
+    @InjectModel(Reel.name) private reelModel: Model<Reel>,
   ) { }
 
   // Lưu (bookmark)
@@ -37,6 +39,7 @@ export class BookmarkService {
     return this.bookmarkModel
       .find({ user: userId })
       .populate('post')
+      .populate('reel')
       .sort({ createdAt: -1 })
       .exec();
   }
@@ -48,4 +51,26 @@ export class BookmarkService {
       post: new Types.ObjectId(postId),
     });
   }
+
+  async createReel(userId: string, reelId: string) {
+    const reel = await this.reelModel.findById(reelId).select('_id');
+    if (!reel) return null;
+    const existing = await this.bookmarkModel.findOne({
+      user: userId,
+      reel: reelId,
+    });
+    if (existing) return existing;
+    return new this.bookmarkModel({
+      user: new Types.ObjectId(userId),
+      reel: new Types.ObjectId(reelId),
+    }).save();
+  }
+
+  async removeReel(userId: string, reelId: string) {
+    return this.bookmarkModel.findOneAndDelete({
+      user: new Types.ObjectId(userId),
+      reel: new Types.ObjectId(reelId),
+    });
+  }
+
 }

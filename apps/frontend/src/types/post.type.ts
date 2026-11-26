@@ -11,6 +11,7 @@ export interface Post {
   _id: string;
   user: User;
   caption?: string;
+  location?: string;
   media: Media[];
   likes: User[];
   tags: string[];
@@ -19,9 +20,9 @@ export interface Post {
 }
 
 export interface PaginatedResponse<T> {
-  data: {
-    docs: T[];
-    total: number;
-    page: number;
-  };
+  docs: T[];
+  totalDocs: number;
+  limit: number;
+  page: number;
+  totalPages: number;
 }

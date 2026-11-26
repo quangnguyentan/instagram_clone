@@ -67,15 +67,10 @@ export class AuthService {
       (userAgent && /Mobi|Android/i.test(userAgent) ? 'mobile' : 'desktop');
 
     // Thu hồi các phiên cũ trước
-    const revokeResult = await this.sessionsService.revokeByUserAndDevice(user?._id?.toString() as any, deviceType);
-    if (revokeResult?.modifiedCount > 0) {
-      const oldSessions = await this.sessionsService.listActiveSessionsByDevice(user?._id?.toString() as any, deviceType);
-      oldSessions.forEach((oldSession) => {
-        if (oldSession.socketId) {
-          this.sessionGateway.forceLogout(oldSession.socketId, "Bạn đã bị đăng xuất do đăng nhập ở thiết bị khác.");
-        }
-      });
-    }
+    await this.sessionsService.revokeByUserAndDevice(
+      user._id.toString(),
+      deviceType,
+    );
 
     // create new session
     const sessionDoc = await this.sessionsService.createSession({

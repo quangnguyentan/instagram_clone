@@ -25,7 +25,7 @@ const GlobalModals = () => {
       case "login":
         return (
           <LoginForm
-            onForgotPassword={() => {}}
+            onForgotPassword={() => { }}
             submitButtonLabel="Đăng nhập"
             submitButtonClassName="w-full"
             isAuthenticated={!!accessToken}

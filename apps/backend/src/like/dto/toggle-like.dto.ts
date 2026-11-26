@@ -1,4 +1,4 @@
-import { IsEnum, IsMongoId, IsString } from 'class-validator';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 
 export class ToggleLikeDto {
   @IsEnum(['post', 'comment', 'reel', 'story'])
@@ -7,6 +7,7 @@ export class ToggleLikeDto {
   @IsMongoId()
   targetId: string;
 
+  @IsOptional()
   @IsString()
-  userId: string;
+  userId?: string;
 }

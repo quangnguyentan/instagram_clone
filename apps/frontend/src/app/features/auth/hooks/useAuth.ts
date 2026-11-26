@@ -14,23 +14,29 @@ export function useLogin() {
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setUser = useAuthStore((s) => s.setUser);
   const setSessionId = useAuthStore((s) => s.setSessionId);
+  const setAuthenticating = useAuthStore((s) => s.setAuthenticating);
   const notifyRef = useContext(NotificationContext);
-  const socket = useSocket();
 
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const res = await api.post("/auth/login", {
-        ...data,
-        deviceType: isMobile ? "mobile" : "desktop",
-        userAgent: navigator.userAgent,
-        socketId: socket?.id,
-      });
-      return res.data;
+      setAuthenticating(true);
+      try {
+        const res = await api.post("/auth/login", {
+          ...data,
+          deviceType: isMobile ? "mobile" : "desktop",
+          userAgent: navigator.userAgent,
+        });
+        return res.data;
+      } catch (error) {
+        setAuthenticating(false);
+        throw error;
+      }
     },
     onSuccess: (data: any) => {
       setAccessToken(data.accessToken);
       setUser(data.user);
       setSessionId(data.sessionId);
+      setAuthenticating(false);
       if (notifyRef && notifyRef.current) {
         notifyRef.current.success({
           message: "Đăng nhập thành công",
@@ -39,6 +45,7 @@ export function useLogin() {
       }
     },
     onError: (error: any) => {
+      setAuthenticating(false);
       if (notifyRef && notifyRef.current) {
         notifyRef.current.error({
           message: "Đăng nhập thất bại",

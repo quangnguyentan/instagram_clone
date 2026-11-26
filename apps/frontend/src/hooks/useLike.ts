@@ -25,6 +25,9 @@ export function useToggleLike() {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["likes", data.targetId], data);
+      if (data.targetType === "story") {
+        queryClient.invalidateQueries({ queryKey: ["stories"] });
+      }
     },
   });
 }

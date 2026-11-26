@@ -9,9 +9,12 @@ export class Reel extends Document {
   caption?: string;
 
   @Prop({ type: [String], default: [] })
-  mediaUrls: string[]; // multiple images / videos
+  mediaUrls: string[];
 
-  @Prop({ type: String, enum: ['image', 'video'], default: 'image' })
+  @Prop({ type: [String], default: [] })
+  mediaPublicIds: string[];
+
+  @Prop({ type: String, enum: ['image', 'video'], default: 'video' })
   mediaType: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })

@@ -6,13 +6,16 @@ import { OnEvent } from '@nestjs/event-emitter';
 @WebSocketGateway({ cors: { origin: true } })
 @Injectable()
 export class SessionGateway {
-    @WebSocketServer() server: Server;
+    @WebSocketServer() server!: Server;
 
     // Gửi sự kiện force_logout khi session bị thu hồi
-    forceLogout(socketId: string, reason?: string) {
+    forceLogout(socketId: string, reason?: string, sessionId?: string) {
         console.log(socketId, reason, "forceLogout called");
         if (!this.server) return;
-        this.server.to(socketId).emit('force_logout', { reason: reason || 'You have been logged out.' });
+        this.server.to(socketId).emit('force_logout', {
+            reason: reason || 'You have been logged out.',
+            sessionId,
+        });
     }
 
     // Xử lý khi client kết nối (tương tự join_room)
@@ -41,7 +44,11 @@ export class SessionGateway {
     handleSessionRevoked(session: any) {
         console.log('Session revoked event:', session);
         if (session.socketId) {
-            this.forceLogout(session.socketId, 'Session has been revoked due to new login.');
+            this.forceLogout(
+                session.socketId,
+                'Session has been revoked due to new login.',
+                session._id?.toString(),
+            );
         }
     }
 }

@@ -1,5 +1,5 @@
 // dto/create-post.dto.ts
-import { IsString, IsOptional, IsArray, IsEnum } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -8,4 +8,8 @@ export class CreatePostDto {
   @IsOptional()
   @IsString()
   caption?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
 }

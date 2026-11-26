@@ -11,6 +11,9 @@ export class Post extends Document {
   @Prop()
   caption?: string;
 
+  @Prop()
+  location?: string;
+
   @Prop([
     {
       url: String,

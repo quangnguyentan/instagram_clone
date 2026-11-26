@@ -7,9 +7,11 @@ import { Post, PostSchema } from 'src/post/entities/post.entity';
 import { Reel, ReelSchema } from 'src/reel/entities/reel.entity';
 import { Story, StorySchema } from 'src/story/entities/story.entity';
 import { LikeGateway } from './like.gateway';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
+    NotificationModule,
     MongooseModule.forFeature([
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },

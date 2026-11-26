@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useAuthStore } from "../features/auth/store/useAuthStore";
 import LoginForm from "../features/auth/components/LoginForm";
 import LoadingScreen from "@/shared/layout/LoadingScreen";
+import MessageButton from "@/app/features/messages/components/MessageButton";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, accessToken } = useAuthStore();
@@ -47,6 +48,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex-1 h-full flex items-center justify-center">
         {children}
       </div>
+      <MessageButton />
     </main>
   );
 };

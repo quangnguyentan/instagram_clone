@@ -1,7 +1,5 @@
-import React from "react";
+import ProfileView from "@/app/features/profile/ProfileView";
 
-const Profile = () => {
-  return <div>Profile</div>;
-};
-
-export default Profile;
+export default function ProfilePage() {
+  return <ProfileView />;
+}

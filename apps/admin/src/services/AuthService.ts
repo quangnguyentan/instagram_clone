@@ -21,7 +21,12 @@ export async function apiSignUp(data: SignUpCredential) {
     return ApiService.fetchDataWithAxios<SignUpResponse>({
         url: endpointConfig.signUp,
         method: 'post',
-        data,
+        data: {
+            username: data.userName,
+            fullname: data.userName,
+            email: data.email,
+            password: data.password,
+        },
     })
 }
 

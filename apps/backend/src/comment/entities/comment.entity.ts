@@ -2,8 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 @Schema({ timestamps: true })
 export class Comment extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'Post', required: true })
-  post: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Post' })
+  post?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Reel' })
+  reel?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   user: Types.ObjectId;
@@ -19,3 +22,4 @@ export class Comment extends Document {
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);
 CommentSchema.index({ post: 1, createdAt: -1 });
+CommentSchema.index({ reel: 1, createdAt: -1 });

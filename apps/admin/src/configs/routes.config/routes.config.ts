@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import authRoute from './authRoute'
 import othersRoute from './othersRoute'
 import type { Routes } from '@/@types/routes'
+import { ADMIN } from '@/constants/roles.constant'
 
 export const publicRoutes: Routes = [...authRoute]
 
@@ -11,6 +12,12 @@ export const protectedRoutes: Routes = [
         path: '/home',
         component: lazy(() => import('@/views/Home')),
         authority: [],
+    },
+    {
+        key: 'moderation',
+        path: '/moderation',
+        component: lazy(() => import('@/views/moderation/Moderation')),
+        authority: [ADMIN],
     },
     /** Example purpose only, please remove */
     {

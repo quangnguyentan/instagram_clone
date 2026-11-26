@@ -1,6 +1,7 @@
 // post.service.ts
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -25,9 +26,9 @@ export class PostService {
 
   async create(
     dto: CreatePostDto,
-    files: Express.Multer.File[],
+    files: Express.Multer.File[] = [],
   ): Promise<Post> {
-    if (!files.length) throw new BadRequestException('Files are required');
+    if (!files.length) throw new BadRequestException('Cần tải lên ít nhất một tệp');
     const uploadedMedia = [];
     for (const file of files) {
       const cloudinaryResponse = await this.cloudinaryService.uploadFile(file);
@@ -51,27 +52,91 @@ export class PostService {
   async findAll(page = 1, limit = 10) {
     return this.postModel.paginate(
       {},
-      { page, limit, sort: { createdAt: -1 }, populate: ['user', 'tags'] },
+      {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: [
+          { path: 'user', select: 'username fullname avatarUrl bio' },
+          { path: 'tags' },
+        ],
+      },
     );
   }
 
   async findOne(id: string): Promise<Post> {
-    const post = await this.postModel.findById(id).populate(['user', 'tags']);
+    const post = await this.postModel
+      .findById(id)
+      .populate('user', 'username fullname avatarUrl bio')
+      .populate('tags');
     if (!post) throw new NotFoundException('Post not found');
     return post;
+  }
+
+  async findByUser(userId: string, page = 1, limit = 20) {
+    return this.postModel.paginate(
+      { user: userId },
+      {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: [
+          { path: 'user', select: 'username fullname avatarUrl bio' },
+          { path: 'tags' },
+        ],
+      },
+    );
+  }
+
+  async explore(page = 1, limit = 20) {
+    return this.postModel.paginate(
+      {},
+      {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: [
+          { path: 'user', select: 'username fullname avatarUrl bio' },
+          { path: 'tags' },
+        ],
+      },
+    );
+  }
+
+  async search(query: string, page = 1, limit = 20) {
+    const term = query.trim();
+    if (!term) {
+      return this.postModel.paginate(
+        { _id: { $exists: false } },
+        { page, limit, populate: { path: 'user', select: 'username fullname avatarUrl' } },
+      );
+    }
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return this.postModel.paginate(
+      { caption: { $regex: escapedTerm, $options: 'i' } },
+      {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+        populate: { path: 'user', select: 'username fullname avatarUrl' },
+      },
+    );
   }
 
   async update(
     id: string,
     dto: UpdatePostDto,
-    files: Express.Multer.File[],
+    files: Express.Multer.File[] = [],
+    userId: string,
+    isAdmin = false,
   ): Promise<Post> {
-    if (!files.length) throw new BadRequestException('Files are required');
     const oldPost = await this.postModel.findById(id);
     if (!oldPost) throw new NotFoundException('Post not found');
+    if (oldPost.user.toString() !== userId && !isAdmin) {
+      throw new ForbiddenException('Không có quyền chỉnh sửa bài viết này');
+    }
 
-    // xoá ảnh cũ trên Cloudinary
-    if (oldPost.media?.length) {
+    if (files.length && oldPost.media?.length) {
       for (const media of oldPost.media) {
         await this.cloudinaryService.deleteFile(media.public_id);
       }
@@ -89,18 +154,24 @@ export class PostService {
         mediaType: file.mimetype.split('/')[0],
       } as { url: string; public_id: string; mediaType: 'image' | 'video' });
     }
+    const changes = files.length
+      ? { ...dto, media: uploadedMedia }
+      : { ...dto };
     const post = await this.postModel.findByIdAndUpdate(
       id,
-      { ...dto, media: uploadedMedia },
+      changes,
       { new: true },
     );
     if (!post) throw new NotFoundException('Post not found');
     return post;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, userId: string, isAdmin = false): Promise<void> {
     const post = await this.postModel.findById(id);
     if (!post) throw new NotFoundException('Post not found');
+    if (post.user.toString() !== userId && !isAdmin) {
+      throw new ForbiddenException('Không có quyền xóa bài viết này');
+    }
     // xoá ảnh trên Cloudinary
     if (post.media?.length) {
       for (const media of post.media) {
@@ -110,7 +181,10 @@ export class PostService {
     await this.postModel.findByIdAndDelete(id);
   }
 
-  async toggleLike(id: string, dto: ToggleLikeDto): Promise<Post> {
+  async toggleLike(
+    id: string,
+    dto: ToggleLikeDto & { userId: string },
+  ): Promise<Post> {
     const post = await this.postModel.findById(id);
     if (!post) throw new NotFoundException('Post not found');
     const likes = new Set((post.likes || []).map((x: any) => x.toString()));
@@ -149,7 +223,11 @@ export class PostService {
         page,
         limit,
         sort: { createdAt: -1 },
-        populate: ['user', 'tags', 'likes'],
+        populate: [
+          { path: 'user', select: 'username fullname avatarUrl bio' },
+          { path: 'tags' },
+          { path: 'likes', select: 'username fullname avatarUrl' },
+        ],
       },
     );
   }

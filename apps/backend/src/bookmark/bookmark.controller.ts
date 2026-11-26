@@ -6,6 +6,7 @@ import {
   Param,
   Req,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { BookmarkService } from './bookmark.service';
 import { JwtAuthGuard } from 'src/auth/guards/guards.guard';
@@ -47,6 +48,22 @@ export class BookmarkController {
     } catch (err) {
       return errorResponse('Không lấy được danh sách bài viết đã lưu', err);
     }
+  }
+
+  @Post('reel/:reelId')
+  async createReel(@Req() req: any, @Param('reelId') reelId: string) {
+    const bookmark = await this.bookmarkService.createReel(
+      req.user.userId,
+      reelId,
+    );
+    if (!bookmark) throw new NotFoundException('Không tìm thấy Reel');
+    return successResponse(bookmark, 'Đã lưu Reel');
+  }
+
+  @Delete('reel/:reelId')
+  async removeReel(@Req() req: any, @Param('reelId') reelId: string) {
+    await this.bookmarkService.removeReel(req.user.userId, reelId);
+    return successResponse(null, 'Đã bỏ lưu Reel');
   }
 
   @Get(':postId/check')

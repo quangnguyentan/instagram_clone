@@ -34,15 +34,23 @@ export class SessionsService {
   }
 
   async revokeByUserAndDevice(userId: string, deviceType: string) {
+    const filter = {
+      userId: new Types.ObjectId(userId),
+      deviceType,
+      revoked: false,
+    };
+    const sessionsToRevoke = await this.sessionModel.find(filter).lean();
+    if (!sessionsToRevoke.length) {
+      return { acknowledged: true, matchedCount: 0, modifiedCount: 0 };
+    }
+
     const result = await this.sessionModel.updateMany(
-      { userId: new Types.ObjectId(userId), deviceType, revoked: false },
+      filter,
       { $set: { revoked: true }, $currentDate: { lastActive: true } }
     );
     if (result.modifiedCount > 0) {
-      // Lấy danh sách session bị thu hồi để emit sự kiện
       const revokedSessions = await this.sessionModel.find({
-        userId: new Types.ObjectId(userId),
-        deviceType,
+        _id: { $in: sessionsToRevoke.map((session) => session._id) },
         revoked: true,
       }).lean();
       revokedSessions.forEach(session => {
@@ -54,6 +62,22 @@ export class SessionsService {
 
   async findById(id: string) {
     return this.sessionModel.findById(id).exec();
+  }
+
+  async setSocketId(sessionId: string, socketId: string) {
+    return this.sessionModel
+      .findOneAndUpdate(
+        { _id: sessionId, revoked: false },
+        { socketId },
+        { new: true },
+      )
+      .exec();
+  }
+
+  async clearSocketId(sessionId: string, socketId: string) {
+    return this.sessionModel
+      .updateOne({ _id: sessionId, socketId }, { $unset: { socketId: 1 } })
+      .exec();
   }
 
   async listActiveSessions(userId: string) {

@@ -26,7 +26,7 @@ export class LikeService {
     };
   }
 
-  async toggle(dto: ToggleLikeDto) {
+  async toggle(dto: ToggleLikeDto & { userId: string }) {
     const { targetType, targetId, userId } = dto;
     const model = this.modelMap[targetType];
     if (!model) throw new BadRequestException('Invalid targetType');
@@ -44,10 +44,13 @@ export class LikeService {
 
     const likes = new Set(rawLikes);
 
+    let isLiked: boolean;
     if (likes.has(userIdStr)) {
       likes.delete(userIdStr);
+      isLiked = false;
     } else {
       likes.add(userIdStr);
+      isLiked = true;
     }
 
     // gán lại doc.likes = ObjectId[]
@@ -57,6 +60,8 @@ export class LikeService {
     return {
       targetType,
       targetId,
+      ownerId: doc.user?.toString(),
+      isLiked,
       likes: doc.likes,
       likesCount: doc.likes.length,
     };

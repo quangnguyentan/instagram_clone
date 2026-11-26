@@ -5,6 +5,7 @@ import {
 } from '@/constants/navigation.constant'
 
 import type { NavigationTree } from '@/@types/navigation'
+import { ADMIN } from '@/constants/roles.constant'
 
 const navigationConfig: NavigationTree[] = [
     {
@@ -15,6 +16,16 @@ const navigationConfig: NavigationTree[] = [
         icon: 'home',
         type: NAV_ITEM_TYPE_ITEM,
         authority: [],
+        subMenu: [],
+    },
+    {
+        key: 'moderation',
+        path: '/moderation',
+        title: 'Kiểm duyệt',
+        translateKey: 'nav.moderation',
+        icon: 'shield',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority: [ADMIN],
         subMenu: [],
     },
     /** Example purpose only, please remove */

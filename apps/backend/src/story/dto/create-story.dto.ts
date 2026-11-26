@@ -1,5 +1,7 @@
+import { IsOptional, IsString } from 'class-validator';
+
 export class CreateStoryDto {
-  user: string;
-  mediaUrl: string;
-  mediaType: 'image' | 'video';
+  @IsOptional()
+  @IsString()
+  caption?: string;
 }

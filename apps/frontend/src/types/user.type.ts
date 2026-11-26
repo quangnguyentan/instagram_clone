@@ -10,6 +10,8 @@ export interface User {
   isVerified: boolean;
   followers: string[]; // ObjectId -> string
   following: string[];
+  followersCount?: number;
+  followingCount?: number;
   createdAt: string;
   updatedAt: string;
 }

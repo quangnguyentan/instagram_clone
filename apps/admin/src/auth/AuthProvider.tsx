@@ -78,7 +78,16 @@ function AuthProvider({ children }: AuthProviderProps) {
         try {
             const resp = await apiSignIn(values)
             if (resp) {
-                handleSignIn({ accessToken: resp.token }, resp.user)
+                handleSignIn(
+                    { accessToken: resp.accessToken },
+                    {
+                        userId: resp.user._id,
+                        userName: resp.user.username,
+                        authority: resp.user.roles ?? [resp.user.role ?? 'user'],
+                        avatar: resp.user.avatarUrl,
+                        email: resp.user.email,
+                    },
+                )
                 redirect()
                 return {
                     status: 'success',
@@ -102,11 +111,10 @@ function AuthProvider({ children }: AuthProviderProps) {
         try {
             const resp = await apiSignUp(values)
             if (resp) {
-                handleSignIn({ accessToken: resp.token }, resp.user)
-                redirect()
+                navigatorRef.current?.navigate('/sign-in')
                 return {
                     status: 'success',
-                    message: '',
+                    message: 'Account created. Please sign in.',
                 }
             }
             return {

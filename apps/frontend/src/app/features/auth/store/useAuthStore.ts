@@ -10,7 +10,9 @@ interface AuthState {
   user: User | null;
   sessionId: string | null;
   isManualLogout: boolean; // Thêm trạng thái này
+  isAuthenticating: boolean;
   setSessionId: (sessionId: string) => void;
+  setAuthenticating: (value: boolean) => void;
   accessToken: string | null;
   setUser: (user: User | null) => void;
   setAccessToken: (token: string | null) => void;
@@ -49,13 +51,21 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       sessionId: null,
       isManualLogout: false, // Khởi tạo
+      isAuthenticating: false,
       setSessionId: (sessionId) => set({ sessionId }),
+      setAuthenticating: (value) => set({ isAuthenticating: value }),
       accessToken: null,
       setUser: (user) => set({ user, isManualLogout: false }),
       setAccessToken: (token) => set({ accessToken: token }),
       setManualLogout: (value) => set({ isManualLogout: value }), // Thêm hàm này
       logout: () => {
-        set({ user: null, sessionId: null, accessToken: null, isManualLogout: true });
+        set({
+          user: null,
+          sessionId: null,
+          accessToken: null,
+          isManualLogout: true,
+          isAuthenticating: false,
+        });
         useAuthStore.persist.clearStorage();
         useSeletedMenuStore.getState().resetSelected();
         useSidebarStore.getState().resetSidebar();

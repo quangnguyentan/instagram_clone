@@ -18,14 +18,15 @@ import BaseDropdown from "../custom/BaseDropdown";
 import { dropdownItems } from "@/lib/dropdownItems";
 import useModalStore from "@/stores/modalStore";
 import NotificationPanel from "./NotificationPanel";
-import ConversationSidebar from "@/app/features/messages/components/ConversationSidebar";
 import useSidebarStore from "@/stores/sidebarStore";
+import CreateComposer from "./CreateComposer";
 
 import { useLogout } from "@/app/features/auth/hooks/useAuth";
 
 const SidebarMenu = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const { isOpenLabel, setIsOpenLabel } = useSidebarStore();
   const { selected, setSelected } = useSeletedMenuStore();
   const { setModal } = useModalStore();
@@ -75,6 +76,7 @@ const SidebarMenu = () => {
                     <button
                       key={label}
                       onClick={() => {
+                        setNotificationOpen(false);
                         setSearchOpen(true);
                       }}
                       className="flex items-center gap-3 rounded-sm py-3 px-3 hover:bg-muted cursor-pointer w-full"
@@ -103,6 +105,7 @@ const SidebarMenu = () => {
                     <button
                       key={label}
                       onClick={() => {
+                        setSearchOpen(false);
                         setNotificationOpen(true);
                       }}
                       className="flex items-center gap-3 rounded-sm py-3 px-3 hover:bg-muted cursor-pointer w-full"
@@ -117,6 +120,39 @@ const SidebarMenu = () => {
                       {!notificationOpen && !searchOpen && isOpenLabel && (
                         <span
                           className={`text-base truncate  ${
+                            selected === label ? "font-medium" : "font-normal"
+                          }`}
+                        >
+                          {label}
+                        </span>
+                      )}
+                    </button>
+                  );
+                }
+                if (label === "Tạo") {
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => {
+                        setSelected(label);
+                        setCreateOpen(true);
+                        setSearchOpen(false);
+                        setNotificationOpen(false);
+                        setIsOpenLabel(true);
+                      }}
+                      className="flex w-full cursor-pointer items-center gap-3 rounded-sm px-3 py-3 hover:bg-muted"
+                    >
+                      <Icon
+                        className={`h-6 w-6 ${
+                          selected === label
+                            ? "text-black"
+                            : "fill-none stroke-current"
+                        }`}
+                      />
+                      {!searchOpen && !notificationOpen && isOpenLabel && (
+                        <span
+                          className={`truncate text-base ${
                             selected === label ? "font-medium" : "font-normal"
                           }`}
                         >
@@ -203,7 +239,10 @@ const SidebarMenu = () => {
         open={notificationOpen}
         onClose={() => setNotificationOpen(false)}
       />
-      <ConversationSidebar open={!isOpenLabel} onClose={() => {}} />
+      <CreateComposer
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+      />
     </div>
   );
 };

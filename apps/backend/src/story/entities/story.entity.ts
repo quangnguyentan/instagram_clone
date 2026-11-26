@@ -8,11 +8,20 @@ export class Story extends Document {
   @Prop({ required: true })
   mediaUrl: string;
 
+  @Prop()
+  mediaPublicId?: string;
+
+  @Prop()
+  caption?: string;
+
   @Prop({ type: String, enum: ['image', 'video'], default: 'image' })
   mediaType: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
   viewers: Types.ObjectId[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  likes: Types.ObjectId[];
 
   // expireAt will be used with a TTL index to auto-delete after 24h
   @Prop()

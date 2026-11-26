@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { User } from "@/types/user.type";
+import { useAuthStore } from "@/app/features/auth/store/useAuthStore";
 
 // Lấy tất cả users
 export function useUsers() {
@@ -16,23 +17,74 @@ export function useUsers() {
 }
 
 // Lấy profile user hiện tại (dựa vào accessToken + refresh token interceptor)
-export function useUserProfile() {
+export function useUserProfile(enabled = true) {
   return useQuery<User>({
     queryKey: ["user-profile"],
     queryFn: async (): Promise<User> => {
       const res = await api.get("/user/profile");
       return res.data as User;
     },
+    enabled,
   });
 }
 
-export function useSuggestions() {
+export function useUserById(id: string) {
+  return useQuery<User>({
+    queryKey: ["user-profile", id],
+    queryFn: async () => {
+      const res = await api.get<User>(`/user/${id}`);
+      return res.data as User;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useUserByUsername(username: string) {
+  return useQuery<User>({
+    queryKey: ["user-profile", "username", username],
+    queryFn: async () => {
+      const res = await api.get<User>(`/user/username/${encodeURIComponent(username)}`);
+      return res.data as User;
+    },
+    enabled: !!username,
+  });
+}
+
+export function useUpdateOwnProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: Partial<Pick<User, "username" | "fullname" | "bio" | "avatarUrl">>) => {
+      const res = await api.patch<User>("/user/profile", data);
+      return res.data as User;
+    },
+    onSuccess: (user) => {
+      useAuthStore.getState().setUser(user);
+      qc.invalidateQueries({ queryKey: ["user-profile"] });
+    },
+  });
+}
+
+export function useSearchUsers(query: string, enabled = true) {
+  return useQuery<User[]>({
+    queryKey: ["user-search", query],
+    queryFn: async () => {
+      const res = await api.get<User[]>("/user/search", {
+        params: { q: query },
+      });
+      return res.data as User[];
+    },
+    enabled: enabled && query.trim().length > 0,
+  });
+}
+
+export function useSuggestions(enabled = true) {
   return useQuery<User[]>({
     queryKey: ["suggestions"],
     queryFn: async (): Promise<User[]> => {
       const res = await api.get("/user/suggestions");
       return res.data as User[];
     },
+    enabled,
   });
 }
 
@@ -105,7 +157,7 @@ export function useUpdateUser() {
     mutationFn: async ({
       id,
       ...data
-    }: { id: number } & Partial<User>): Promise<User> => {
+    }: { id: string } & Partial<User>): Promise<User> => {
       const res = await api.patch(`/user/${id}`, data);
       return res.data as User;
     },
@@ -119,7 +171,7 @@ export function useUpdateUser() {
 export function useDeleteUser() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: number): Promise<User> => {
+    mutationFn: async (id: string): Promise<User> => {
       const res = await api.delete(`/user/${id}`);
       return res.data as User;
     },

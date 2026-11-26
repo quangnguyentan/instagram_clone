@@ -19,6 +19,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SessionModule } from './session/session.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -47,7 +48,8 @@ import { BookmarkModule } from './bookmark/bookmark.module';
     LikeModule,
     CloudinaryModule,
     SessionModule,
-    BookmarkModule
+    BookmarkModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

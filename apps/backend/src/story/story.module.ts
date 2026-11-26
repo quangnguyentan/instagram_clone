@@ -5,9 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Story, StorySchema } from './entities/story.entity';
 import { User, UserSchema } from 'src/user/entities/user.entity';
 import { StoryGateway } from './story.gateway';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
+    CloudinaryModule,
     MongooseModule.forFeature([
       { name: Story.name, schema: StorySchema },
       { name: User.name, schema: UserSchema },

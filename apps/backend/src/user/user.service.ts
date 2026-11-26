@@ -1,202 +1,197 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
-import { Model, Types } from 'mongoose';
+import { NotificationGateway } from 'src/notification/notification.gateway';
+
+const publicUserFields = '-password -refreshToken';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
-  ) { }
+    private readonly notificationGateway: NotificationGateway,
+  ) {}
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    return this.userModel.create(createUserDto).then((user) => this.profile(user.id));
   }
 
   async findAll() {
-    const users = await this.userModel.find();
-    return users;
+    return this.userModel.find().select(publicUserFields).sort({ createdAt: -1 });
   }
-  async findByUsername(username: string) {
-    return await this.userModel.findOne({ username }).exec();
 
+  async search(query: string, currentUserId: string) {
+    const term = query.trim();
+    if (!term) return [];
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return this.userModel
+      .find({
+        _id: { $ne: new Types.ObjectId(currentUserId) },
+        $or: [
+          { username: { $regex: escapedTerm, $options: 'i' } },
+          { fullname: { $regex: escapedTerm, $options: 'i' } },
+        ],
+      })
+      .select('username fullname avatarUrl bio')
+      .limit(20)
+      .sort({ username: 1 })
+      .lean();
+  }
+
+  async findByUsername(username: string) {
+    return this.userModel
+      .findOne({ username })
+      .select(publicUserFields)
+      .exec();
   }
 
   async profile(userId: string) {
-    const user = await this.userModel.findById(userId);
-    return user;
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new BadRequestException('Mã người dùng không hợp lệ');
+    }
+    const user = await this.userModel
+      .findById(userId)
+      .select(publicUserFields)
+      .lean();
+    if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+    return {
+      ...user,
+      followersCount: user.followers?.length ?? 0,
+      followingCount: user.following?.length ?? 0,
+    };
   }
 
   async getSuggestions(userId: string, limit = 5) {
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new BadRequestException('Mã người dùng không hợp lệ');
+    }
     const currentUser = await this.userModel
       .findById(userId)
       .select('following');
-    if (!currentUser) throw new Error('User không tồn tại');
+    if (!currentUser) throw new NotFoundException('Không tìm thấy người dùng');
 
     const excluded = [new Types.ObjectId(userId), ...currentUser.following];
-
-    let candidateIds: Types.ObjectId[] = [];
-
-    if (currentUser.following.length > 0) {
-      // Lấy danh sách bạn bè của những người mình follow
-      const friendsOfFollowing = await this.userModel.aggregate([
-        { $match: { _id: { $in: currentUser.following } } },
-        { $unwind: { path: '$following', preserveNullAndEmptyArrays: true } },
-        { $group: { _id: null, following: { $addToSet: '$following' } } },
-      ]);
-
-      candidateIds =
-        friendsOfFollowing.length > 0 ? friendsOfFollowing[0].following : [];
-    }
-
-    let suggestions: User[] = [];
-
-    if (candidateIds.length > 0) {
-      // Gợi ý từ bạn của bạn bè
-      suggestions = await this.userModel.aggregate([
-        { $match: { _id: { $nin: excluded, $in: candidateIds } } },
-        { $addFields: { followersCount: { $size: '$followers' } } },
-        { $sort: { followersCount: -1 } },
-        { $limit: limit },
-        { $project: { password: 0, refreshToken: 0 } },
-      ]);
-    }
-
-    // Nếu chưa đủ (hoặc không có) → fallback sang random global
-    if (suggestions.length < limit) {
-      const fallback = await this.userModel.aggregate([
-        { $match: { _id: { $nin: excluded } } },
-        { $addFields: { followersCount: { $size: '$followers' } } },
-        { $sort: { followersCount: -1 } },
-        { $limit: limit - suggestions.length },
-        { $project: { password: 0, refreshToken: 0 } },
-      ]);
-
-      suggestions = [...suggestions, ...fallback];
-    }
-
-    return suggestions;
+    return this.userModel
+      .find({ _id: { $nin: excluded } })
+      .select('username fullname avatarUrl bio')
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
   }
 
-  // async getSuggestions(userId: string, limit = 5) {
-  //   const currentUser = await this.userModel
-  //     .findById(userId)
-  //     .select('following');
-  //   if (!currentUser) throw new Error('User không tồn tại');
-
-  //   let suggestions: User[] = [];
-
-  //   const excluded = [new Types.ObjectId(userId), ...currentUser.following];
-
-  //   if (currentUser.following.length > 0) {
-  //     //  Bạn của bạn bè + ưu tiên người có nhiều followers
-  //     const friendsOfFollowing = await this.userModel.aggregate([
-  //       { $match: { _id: { $in: currentUser.following } } },
-  //       { $unwind: '$following' },
-  //       { $group: { _id: null, following: { $addToSet: '$following' } } },
-  //     ]);
-
-  //     const candidateIds =
-  //       friendsOfFollowing.length > 0 ? friendsOfFollowing[0].following : [];
-
-  //     suggestions = await this.userModel.aggregate([
-  //       {
-  //         $match: {
-  //           _id: { $nin: excluded, $in: candidateIds },
-  //         },
-  //       },
-  //       {
-  //         $addFields: {
-  //           followersCount: { $size: '$followers' },
-  //         },
-  //       },
-  //       { $sort: { followersCount: -1 } }, // ưu tiên nhiều followers
-  //       { $sample: { size: limit } }, // random trong nhóm ưu tiên
-  //       {
-  //         $project: {
-  //           password: 0,
-  //           refreshToken: 0,
-  //         },
-  //       },
-  //     ]);
-  //   } else {
-  //     //  Nếu chưa follow ai → random từ tất cả user nhưng ưu tiên người có nhiều followers
-  //     suggestions = await this.userModel.aggregate([
-  //       { $match: { _id: { $ne: new Types.ObjectId(userId) } } },
-  //       {
-  //         $addFields: {
-  //           followersCount: { $size: '$followers' },
-  //         },
-  //       },
-  //       { $sort: { followersCount: -1 } },
-  //       { $sample: { size: limit } },
-  //       {
-  //         $project: {
-  //           password: 0,
-  //           refreshToken: 0,
-  //         },
-  //       },
-  //     ]);
-  //   }
-
-  //   return suggestions;
-  // }
   async follow(userId: string, targetId: string) {
-    if (userId === targetId) throw new Error('Không thể tự follow chính mình');
-
-    await this.userModel.findByIdAndUpdate(userId, {
-      $addToSet: { following: targetId },
+    this.assertValidIds(userId, targetId);
+    if (userId === targetId) {
+      throw new BadRequestException('Không thể tự theo dõi chính mình');
+    }
+    const target = await this.userModel.exists({ _id: targetId });
+    if (!target) throw new NotFoundException('Không tìm thấy người dùng');
+    const alreadyFollowing = await this.userModel.exists({
+      _id: userId,
+      following: targetId,
     });
 
-    await this.userModel.findByIdAndUpdate(targetId, {
-      $addToSet: { followers: userId },
-    });
-
-    return { message: 'Follow thành công' };
+    await Promise.all([
+      this.userModel.updateOne(
+        { _id: userId },
+        { $addToSet: { following: new Types.ObjectId(targetId) } },
+      ),
+      this.userModel.updateOne(
+        { _id: targetId },
+        { $addToSet: { followers: new Types.ObjectId(userId) } },
+      ),
+    ]);
+    if (!alreadyFollowing) {
+      await this.notificationGateway.push(targetId, {
+        user: targetId,
+        type: 'follow',
+        fromUser: userId,
+      });
+    }
+    return this.profile(targetId);
   }
 
   async unfollow(userId: string, targetId: string) {
-    if (userId === targetId)
-      throw new Error('Không thể tự unfollow chính mình');
-
-    await this.userModel.findByIdAndUpdate(userId, {
-      $pull: { following: targetId },
-    });
-
-    await this.userModel.findByIdAndUpdate(targetId, {
-      $pull: { followers: userId },
-    });
-
-    return { message: 'Unfollow thành công' };
+    this.assertValidIds(userId, targetId);
+    if (userId === targetId) {
+      throw new BadRequestException('Không thể bỏ theo dõi chính mình');
+    }
+    await Promise.all([
+      this.userModel.updateOne(
+        { _id: userId },
+        { $pull: { following: new Types.ObjectId(targetId) } },
+      ),
+      this.userModel.updateOne(
+        { _id: targetId },
+        { $pull: { followers: new Types.ObjectId(userId) } },
+      ),
+    ]);
+    return this.profile(targetId);
   }
 
   async getFollowers(userId: string) {
     const user = await this.userModel
       .findById(userId)
-      .populate('followers', 'username fullname avatarUrl');
-    if (!user) throw new Error('User không tồn tại');
+      .populate('followers', 'username fullname avatarUrl bio')
+      .select('followers');
+    if (!user) throw new NotFoundException('Không tìm thấy người dùng');
     return user.followers;
   }
 
   async getFollowing(userId: string) {
     const user = await this.userModel
       .findById(userId)
-      .populate('following', 'username fullname avatarUrl');
-    if (!user) throw new Error('User không tồn tại');
+      .populate('following', 'username fullname avatarUrl bio')
+      .select('following');
+    if (!user) throw new NotFoundException('Không tìm thấy người dùng');
     return user.following;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async updateProfile(userId: string, updateUserDto: UpdateUserDto) {
+    const { username, fullname, bio, avatarUrl } = updateUserDto;
+    const updated = await this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { username, fullname, bio, avatarUrl },
+        { new: true, runValidators: true },
+      )
+      .select(publicUserFields);
+    if (!updated) throw new NotFoundException('Không tìm thấy người dùng');
+    return updated;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const { username, fullname, bio, avatarUrl, role, isVerified } =
+      updateUserDto;
+    const updated = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        { username, fullname, bio, avatarUrl, role, isVerified },
+        { new: true, runValidators: true },
+      )
+      .select(publicUserFields);
+    if (!updated) throw new NotFoundException('Không tìm thấy người dùng');
+    return updated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const removed = await this.userModel
+      .findByIdAndDelete(id)
+      .select(publicUserFields);
+    if (!removed) throw new NotFoundException('Không tìm thấy người dùng');
+    return removed;
+  }
+
+  private assertValidIds(...ids: string[]) {
+    if (ids.some((id) => !Types.ObjectId.isValid(id))) {
+      throw new BadRequestException('Mã người dùng không hợp lệ');
+    }
   }
 }

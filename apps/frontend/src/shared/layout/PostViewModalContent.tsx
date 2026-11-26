@@ -13,6 +13,7 @@ import PostComment from "./PostComment";
 import PostCommentInput from "./PostCommentInput";
 import PostStats from "./PostStats";
 import PostActions from "./PostActions";
+import PostShareDialog from "./PostShareDialog";
 import { usePostState } from "@/hooks/usePostState";
 import useModalStore from "@/stores/modalStore";
 
@@ -34,6 +35,7 @@ const PostViewModalContent: React.FC<PostViewModalContentProps> = ({
   const [value, setValue] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
   const [explain, setExplain] = useState<{ [key: string]: boolean }>({});
+  const [shareOpen, setShareOpen] = useState(false);
   const createCommentMutation = useCreateComment();
   const {
     isLiked,
@@ -158,7 +160,7 @@ const PostViewModalContent: React.FC<PostViewModalContentProps> = ({
               handleLikePostToggle(post?._id as string, user?._id as string)
             }
             onSave={handleSavePostToggle}
-            onShare={() => {}}
+            onShare={() => setShareOpen(true)}
             isBookmarked={isBookmarked}
           />
           <PostStats createdAt={createdPost} likesCount={likesCount} />
@@ -171,6 +173,13 @@ const PostViewModalContent: React.FC<PostViewModalContentProps> = ({
           />
         </div>
       </div>
+      {post && (
+        <PostShareDialog
+          post={post}
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </div>
   );
 };

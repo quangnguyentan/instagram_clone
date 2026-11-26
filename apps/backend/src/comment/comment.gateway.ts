@@ -25,16 +25,37 @@ export class CommentGateway {
 
   @OnEvent('comment.created')
   handleCreated(comment: Comment) {
-    this.server.to(comment.post.toString()).emit('comment.created', comment);
+    if (comment.post) {
+      this.server.to(comment.post.toString()).emit('comment.created', comment);
+    }
   }
 
   @OnEvent('comment.updated')
   handleUpdated(comment: Comment) {
-    this.server.to(comment.post.toString()).emit('comment.updated', comment);
+    const targetId = comment.post?.toString() ?? comment.reel?.toString();
+    if (targetId) {
+      this.server
+        .to(targetId)
+        .emit(comment.post ? 'comment.updated' : 'reel.comment.updated', comment);
+    }
+  }
+
+  @OnEvent('reel.comment.created')
+  handleReelCreated(comment: Comment) {
+    if (comment.reel) {
+      this.server
+        .to(comment.reel.toString())
+        .emit('reel.comment.created', comment);
+    }
   }
 
   @OnEvent('comment.deleted')
-  handleDeleted(payload: { id: string; postId: string }) {
-    this.server.to(payload.postId).emit('comment.deleted', payload);
+  handleDeleted(payload: { id: string; postId?: string; reelId?: string }) {
+    const targetId = payload.postId ?? payload.reelId;
+    if (targetId) {
+      this.server
+        .to(targetId)
+        .emit(payload.postId ? 'comment.deleted' : 'reel.comment.deleted', payload);
+    }
   }
 }

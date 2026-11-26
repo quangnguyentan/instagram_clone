@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Post as PostType } from "@/types/post.type";
 import PostMedia from "./PostMedia";
 import PostActions from "./PostActions";
@@ -24,11 +24,14 @@ import {
   useCreateBookmark,
   useDeleteBookmark,
 } from "@/hooks/useBookmarks";
+import { useUnfollow } from "@/hooks/useUsers";
 
 import { usePostState } from "@/hooks/usePostState";
+import PostShareDialog from "./PostShareDialog";
 
 const PostCard = ({ post }: { post: PostType }) => {
   const { user } = useAuthStore();
+  const [shareOpen, setShareOpen] = useState(false);
   const { data: comments = [] } = useComments(post._id);
   const { data: bookmark } = useCheckBookmark(post._id);
 
@@ -37,6 +40,7 @@ const PostCard = ({ post }: { post: PostType }) => {
   const deleteMutation = useDeleteComment();
   const createBookmark = useCreateBookmark();
   const deleteBookmark = useDeleteBookmark();
+  const unfollow = useUnfollow(post.user._id);
   const { openModal } = useOpenModal();
 
   const {
@@ -123,7 +127,17 @@ const PostCard = ({ post }: { post: PostType }) => {
   };
   return (
     <div className="w-full">
-      <PostHeader user={post.user} createdAt={post.createdAt} />
+      <PostHeader
+        user={post.user}
+        createdAt={post.createdAt}
+        postId={post._id}
+        isOwnPost={user?._id === post.user._id}
+        isFollowing={user?.following?.includes(post.user._id) ?? false}
+        isBookmarked={isBookmarked}
+        onShare={() => setShareOpen(true)}
+        onSave={handleSavePostToggle}
+        onUnfollow={() => unfollow.mutate()}
+      />
       <PostMedia media={post.media} />
       <PostActions
         liked={isLiked}
@@ -152,6 +166,11 @@ const PostCard = ({ post }: { post: PostType }) => {
         handleOpenCommentModal={handleOpenCommentModal}
       />
       <PostAddComment onSubmit={handleCommentSubmit} />
+      <PostShareDialog
+        post={post}
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+      />
     </div>
   );
 };
