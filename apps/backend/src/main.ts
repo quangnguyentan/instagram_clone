@@ -7,7 +7,7 @@ async function bootstrap() {
   app.useWebSocketAdapter(new IoAdapter(app)); // Bắt buộc cho WebSocket
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    origin: [process.env.FRONTEND_URL ?? 'http://localhost:3000', process.env.ADMIN_URL ?? 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
