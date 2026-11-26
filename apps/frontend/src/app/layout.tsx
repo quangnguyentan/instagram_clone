@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@ant-design/v5-patch-for-react-19";
 import "../styles/globals.css";
 import Providers from "../providers/QueryClientProvider";
 import { NotificationProvider } from "@/providers/NotificationProvider";
